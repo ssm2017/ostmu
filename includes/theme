@@ -1,0 +1,39 @@
+#! /bin/bash
+
+# gadget for coloring text
+ColEscape="\033";
+ColBlackF="${ColEscape}[30m";
+ColRedF="${ColEscape}[31m";
+ColGreenF="${ColEscape}[32m";
+ColYellowF="${ColEscape}[33m";
+ColBlueF="${ColEscape}[34m";
+ColPurplef="${ColEscape}[35m";
+ColCyanF="${ColEscape}[36m";
+ColWhiteF="${ColEscape}[37m";
+ColBlackB="${ColEscape}[40m";
+ColRedB="${ColEscape}[41m";
+ColGreenB="${ColEscape}[42m";
+ColYellowB="${ColEscape}[43m";
+ColBlueB="${ColEscape}[44m";
+ColPurpleB="${ColEscape}[45m";
+ColCyanB="${ColEscape}[46m";
+ColWhiteB="${ColEscape}[47m";
+ColBoldOn="${ColEscape}[1m";
+ColBoldOff="${ColEscape}[22m";
+ColItalicsOn="${ColEscape}[3m";
+ColItalicsOff="${ColEscape}[23m";
+ColUnderlineOn="${ColEscape}[4m";
+ColUnderlineOff="${ColEscape}[24m";
+ColBlinkOn="${ColEscape}[5m";
+ColBlinkOff="${ColEscape}[25m";
+ColInvertOn="${ColEscape}[7m";
+ColInvertOff="${ColEscape}[27m";
+ColReset="${ColEscape}[0m";
+
+# symbols
+SymbolOk=" "
+SymbolNotOk=" "
+
+LOG_CONFIG="[CONFIG] "
+LOG_TMUX_SESSION="[TMUX SESSION] "
+LOG_TMUX_WINDOW="[TMUX WINDOW] "

@@ -1,0 +1,68 @@
+#! /bin/bash
+
+# include some files
+OPENSIM_SCRIPT_FOLDER="/opt/opensim/scripts"
+source "${OPENSIM_SCRIPT_FOLDER}/etc/config"
+
+# define some vars
+USER_NAME=$1
+SIM_NAME=$2
+
+# begin of logic
+if [ $# -lt 2 ];then
+  show_help
+  exit;
+fi
+
+# check if the user exists
+if user_exists ${USER_NAME} > /dev/null; then
+  echo -e "${ColGreenF}${SymbolOk}User ${USER_NAME} exists.${ColReset}"
+else
+  echo -e "${ColRedF}${SymbolNotOk}User ${USER_NAME} does not exist.${ColReset}"
+  exit 1;
+fi
+
+# check if the simulator folder exists
+if simulator_folder_exists ${USER_NAME} ${SIM_NAME} > /dev/null;then
+  echo -e "${ColGreenF}${SymbolOk}Folder ${SIM_FOLDER} exists.${ColReset}"
+else
+  echo -e "${ColRedF}${SymbolNotOk}Folder ${SIM_FOLDER} does not exist.${ColReset}"
+  exit 1;
+fi
+
+# check the simulator pid
+PID=$(get_sim_pid ${USER_NAME} ${SIM_NAME})
+if [ $? = 0 ]; then
+  echo -e "${ColGreenF}${SymbolOk}Pid file exists.${ColReset}"
+  if check_pid ${PID} > /dev/null;then
+    echo -e "${ColGreenF}${SymbolOk}Pid is running.${ColReset}"
+  else
+    echo -e "${ColRedF}${SymbolNotOk}Pid is not running.${ColReset}"
+  fi
+else
+  echo -e "${ColRedF}${SymbolNotOk}Pid file does not exist.${ColReset}"
+  exit 1;
+fi
+
+# check if the tmux session is running
+if tmux_session_exists "os-${USER_NAME}"; then
+  echo -e "${ColGreenF}${SymbolOk}Tmux session is running.${ColReset}"
+else
+  echo -e "${ColRedF}${SymbolNotOk}Tmux session is not running.${ColReset}"
+fi
+
+# check if the tmux window is running
+if tmux_window_exists "os-${USER_NAME}" "${SIM_NAME}"; then
+  echo -e "${ColGreenF}${SymbolOk}Tmux window is running.${ColReset}"
+else
+  echo -e "${ColRedF}${SymbolNotOk}Tmux window is not running.${ColReset}"
+  exit 1;
+fi
+
+# check if the console is answering
+if simulator_console_is_answering "${USER_NAME}" "${SIM_NAME}"; then
+  echo -e "${ColGreenF}${SymbolOk}The simulator console is answering.${ColReset}"
+else
+  echo -e "${ColRedF}${SymbolNotOk}The simulator console is not answering.${ColReset}"
+  exit 1;
+fi

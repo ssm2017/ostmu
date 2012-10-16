@@ -1,0 +1,13 @@
+#! /bin/bash
+
+# check if the user exists
+# $1 User name
+user_exists() {
+  if [ $(id -u ${1} 2>/dev/null) ]; then
+    echo "User ${1} exists."
+    return 0;
+  else
+    echo "User ${1} does not exist."
+    return 1;
+  fi
+}

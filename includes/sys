@@ -1,0 +1,14 @@
+#! /bin/bash
+
+# check pid
+# $1 Pid
+check_pid() {
+  #~ if [ $(ps -a | grep "${1}" | cut -d " " -f1) = ${1} ];then
+  if [ -e /proc/${1} ]; then
+    echo "Pid is running."
+    return 0;
+  else
+    echo "Pid is not running."
+    return 1;
+  fi
+}

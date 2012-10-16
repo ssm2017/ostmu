@@ -1,0 +1,23 @@
+#! /bin/bash
+
+# some vars
+OPENSIM_FOLDER="/opt/opensim/bin"
+OPENSIM_BIN="${OPENSIM_FOLDER}/OpenSim.exe"
+
+TMUX_SOCKET_FOLDER="/tmp/tmux/sockets/opensim"
+TMUX_SOCKET_FOLDER_GROUP_NAME="tmux-share"
+
+USER_HOME=$(eval echo ~${SUDO_USER})
+OPENSIM_LOCAL_CONFIG_FOLDER=${USER_HOME}/.opensim
+
+OPENSIM_INI_MODELS_FOLDER="/opt/opensim/scripts/models"
+OPENSIM_PORTS_FILE="${OPENSIM_SCRIPT_FOLDER}/etc/ports"
+
+# include functions files
+source "${OPENSIM_SCRIPT_FOLDER}/includes/sys"
+source "${OPENSIM_SCRIPT_FOLDER}/includes/users"
+source "${OPENSIM_SCRIPT_FOLDER}/includes/tmux"
+source "${OPENSIM_SCRIPT_FOLDER}/includes/sims"
+
+# include the colors declarations
+source "${OPENSIM_SCRIPT_FOLDER}/includes/theme"

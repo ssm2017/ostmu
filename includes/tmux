@@ -1,0 +1,14 @@
+#! /bin/bash
+
+# Check if the tmux session exists
+# $1 Session name
+tmux_session_exists() {
+  tmux -S "${TMUX_SOCKET_FOLDER}/${1}" list-session 2>&1 | grep -q "^${1}"
+}
+
+# Check if the tmux window exists
+# $1 Session name
+# $2 Window name
+tmux_window_exists() {
+  tmux -S "${TMUX_SOCKET_FOLDER}"/"${1}" list-window -t "${1}" 2>&1 | grep -q ": $2 \["
+}

@@ -1,0 +1,16 @@
+#! /bin/bash
+
+rm -R /home/toto/.opensim/
+cd /opt/opensim/scripts
+./create_sim_files toto aaa
+./create_sim_files toto bbb
+./create_sim_files toto ccc
+./create_sim_files toto ddd
+./create_sim_files toto eee
+./create_sim_files toto fff
+./create_sim_files toto ggg
+./create_sim_files toto hhh
+./create_sim_files toto iii
+./create_sim_files toto jjj
+./create_sim_files toto kkk
+./create_sim_files toto lll
