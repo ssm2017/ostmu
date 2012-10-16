@@ -46,7 +46,7 @@ simulator_console_is_answering() {
 # $2 sim name
 run_simulator() {
   # clear the log
-  cp /dev/null "${OPENSIM_LOCAL_CONFIG_FOLDER}/${2}.sim/log/${2}.log"
+  cp /dev/null "${OPENSIM_LOCAL_CONFIG_FOLDER}/${2}.sim/log/tmux.log"
   # start the log
   tmux -S "${TMUX_SOCKET_FOLDER}/os-${1}" send-keys -t "os-${1}":"${2}" "tmux pipe-pane -o -t os-${1}:${2} 'cat >> ${OPENSIM_LOCAL_CONFIG_FOLDER}/${2}.sim/log/tmux.log'" Enter
   # start the simulator
