@@ -1,5 +1,5 @@
 #! /bin/bash
-echo -e "${ColReset}starting Init"
+echo -e "starting Init"
 
 # define some vars
 OPENSIM_SCRIPT_FOLDER="/opt/opensim/scripts"
@@ -7,30 +7,30 @@ source "${OPENSIM_SCRIPT_FOLDER}/etc/config"
 
 # check if the socket folder exist
 if [ ! -d "${TMUX_SOCKET_FOLDER}" ]; then
-  echo -e "${ColRedF}${SymbolNotOk}Folder ${TMUX_SOCKET_FOLDER} does not exist.${ColReset}";
+  echo -e "${SymbolNotOk}Folder ${TMUX_SOCKET_FOLDER} does not exist.$";
   mkdir -p "${TMUX_SOCKET_FOLDER}"
   if [ $? == 0 ]; then
-    echo -e "${ColRedF}${SymbolNotOk}Error creating folder : ${TMUX_SOCKET_FOLDER}${ColReset}"
+    echo -e "${SymbolNotOk}Error creating folder : ${TMUX_SOCKET_FOLDER}"
   else
-    echo -e "${ColGreenF}${SymbolOk}Folder ${TMUX_SOCKET_FOLDER} created.${ColReset}"
+    echo -e "${SymbolOk}Folder ${TMUX_SOCKET_FOLDER} created."
   fi
 else
-  echo -e "${ColGreenF}${SymbolOk}Folder ${TMUX_SOCKET_FOLDER} exists.${ColReset}"
+  echo -e "${SymbolOk}Folder ${TMUX_SOCKET_FOLDER} exists."
 fi
 
 # check ig the socket folder has the good group ownership
 if [ $(stat -c %G "${TMUX_SOCKET_FOLDER}") != "${TMUX_SOCKET_FOLDER_GROUP_NAME}" ]; then
-  echo -e "${ColRedF}${SymbolNotOk}Folder ${TMUX_SOCKET_FOLDER} does not have the good group ownership.${ColReset}"
+  echo -e "${SymbolNotOk}Folder ${TMUX_SOCKET_FOLDER} does not have the good group ownership."
   echo "Assigning the folder group to : ${TMUX_SOCKET_FOLDER_GROUP_NAME}"
   chown root:"${TMUX_SOCKET_FOLDER_GROUP_NAME}" "${TMUX_SOCKET_FOLDER}"
 else
-  echo -e "${ColGreenF}${SymbolOk}Folder ${TMUX_SOCKET_FOLDER} has the good group ownership.${ColReset}"
+  echo -e "${SymbolOk}Folder ${TMUX_SOCKET_FOLDER} has the good group ownership."
 fi
 
 # check if the socket folder is writable to everyone
 if [ ! $(stat -c %a "${TMUX_SOCKET_FOLDER}") = "2777" ]; then
-  echo -e "${ColRedF}${SymbolNotOk}Folder ${TMUX_SOCKET_FOLDER} permissions are not 2777${ColReset}"
+  echo -e "${SymbolNotOk}Folder ${TMUX_SOCKET_FOLDER} permissions are not 2777"
   chmod 2777 "${TMUX_SOCKET_FOLDER}"
 else
-  echo -e "${ColGreenF}${SymbolOk}Folder ${TMUX_SOCKET_FOLDER} permissions are 2777${ColReset}"
+  echo -e "${SymbolOk}Folder ${TMUX_SOCKET_FOLDER} permissions are 2777"
 fi

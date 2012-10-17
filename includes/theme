@@ -31,8 +31,8 @@ ColInvertOff="${ColEscape}[27m";
 ColReset="${ColEscape}[0m";
 
 # symbols
-SymbolOk=" "
-SymbolNotOk=" "
+SymbolOk="${ColGreenF}${ColReset} "
+SymbolNotOk="${ColRedF}${ColReset} "
 
 LOG_CONFIG="[CONFIG] "
 LOG_TMUX_SESSION="[TMUX SESSION] "
