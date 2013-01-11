@@ -1,24 +1,25 @@
 #! /bin/bash
 
-# opensim path
+# lang
+source "${OSTMU_FOLDER}/includes/lang/en"
+
+# opensim
 OPENSIM_FOLDER="/opt/opensim/bin"
 OPENSIM_BIN="${OPENSIM_FOLDER}/OpenSim.exe"
+OPENSIM_GRID_IP=127.0.0.1
 
 # tmux
 TMUX_SOCKET_FOLDER="/tmp/tmux/sockets/opensim"
 TMUX_SOCKET_FOLDER_GROUP_NAME="tmux-share"
 
-# lang
-source "${OSTMU_FOLDER}/includes/lang/eng"
-
 # ostmu
-OSTMU_INI_MODELS_FOLDER="/opt/opensim/scripts/models"
+OSTMU_INI_MODELS_FOLDER="${OSTMU_FOLDER}/models"
 OSTMU_PORTS_FILE="${OSTMU_FOLDER}/etc/ports"
-USER_CONFIG_FILE_NAME=".opensim"
+USER_CONFIG_FOLDER_NAME=".opensim"
 
 # NOTHING SHOULD BE CHANGED UNDER THIS LINE
 USER_HOME=$(eval echo ~${SUDO_USER})
-OPENSIM_LOCAL_CONFIG_FOLDER="${USER_HOME}"/"${USER_CONFIG_FILE_NAME}"
+USER_CONFIG_FOLDER_PATH="${USER_HOME}"/"${USER_CONFIG_FOLDER_NAME}"
 
 # include the colors declarations
 source "${OSTMU_FOLDER}/includes/theme"

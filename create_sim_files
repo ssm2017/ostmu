@@ -18,6 +18,7 @@ show_help() {
 add_file() {
   cat "${OSTMU_INI_MODELS_FOLDER}/$1" | \
   sed -e 's/<\[user_name\]>/'${USER_NAME}'/g' \
+  -e 's/<\[grid_ip\]>/'${OPENSIM_GRID_IP}'/g' \
   -e 's/<\[sim_name\]>/'${SIM_NAME}'/g' \
   -e 's/<\[sim_port\]>/'${SIM_PORT}'/g' > $2
 }
@@ -42,7 +43,7 @@ get_next_available_user_port() {
 
 create_sim_files() {
   # count user sim folders
-  sim_files_qty=$(find ${USER_OPENSIM_FOLDER} -type d -name "*.sim" | wc -l)
+  sim_files_qty=$(find ${USER_CONFIG_FOLDER_PATH} -type d -name "*.sim" | wc -l)
   if [ ${sim_files_qty} -gt 9 ];then
     print_message "${_MAX_10_SIMS_PER_USER}" "error"
     exit;
@@ -94,23 +95,22 @@ else
   exit 1;
 fi
 
-# check if the user opensim folder exists and if not, create it.
-USER_OPENSIM_FOLDER="/home/$USER_NAME/.opensim"
-if [ ! -d "${USER_OPENSIM_FOLDER}" ];then
-  print_message "${_THE_FOLDER} ${USER_OPENSIM_FOLDER} ${_DOES_NOT_EXIST}." "notok"
-  print_message "${_CREATING_THE_FOLDER}."
-  mkdir -p "${USER_OPENSIM_FOLDER}"
-  chown "${USER_NAME}":"${USER_NAME}" "${USER_OPENSIM_FOLDER}"
+# check if the user config folder exists and if not, create it.
+if [ -d "${USER_CONFIG_FOLDER_PATH}" ];then
+  print_message "${_THE_FOLDER} ${USER_CONFIG_FOLDER_PATH} ${_EXISTS}." "ok"
 else
-  print_message "${_THE_FOLDER} ${USER_OPENSIM_FOLDER} ${_EXISTS}." "ok"
+  print_message "${_THE_FOLDER} ${USER_CONFIG_FOLDER_PATH} ${_DOES_NOT_EXIST}." "notok"
+  print_message "${_CREATING_THE_FOLDER}."
+  mkdir -p "${USER_CONFIG_FOLDER_PATH}"
+  chown "${USER_NAME}":"${USER_NAME}" "${USER_CONFIG_FOLDER_PATH}"
 fi
 
 # check if the simulator folder exists and if not, create it
-SIM_FOLDER="${USER_OPENSIM_FOLDER}/${SIM_NAME}.sim"
-if [ ! -d "${SIM_FOLDER}" ];then
+SIM_FOLDER="${USER_CONFIG_FOLDER_PATH}/${SIM_NAME}.sim"
+if [ -d "${SIM_FOLDER}" ];then
+  print_message "${_THE_FOLDER} ${SIM_FOLDER} ${_EXISTS}." "ok"
+else
   print_message "${_THE_FOLDER} ${SIM_FOLDER} ${_DOES_NOT_EXIST}." "notok"
   print_message "${_CREATING_THE_FOLDER}."
   create_sim_files "${SIM_FOLDER}"
-else
-  print_message "${_THE_FOLDER} ${SIM_FOLDER} ${_EXISTS}." "ok"
 fi

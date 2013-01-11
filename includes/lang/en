@@ -38,6 +38,7 @@ _ASSIGNING_FOLDER_GROUP_TO="Assigning the folder group to"
 _THE_PERMISSIONS_OF="The permissions of"
 
 # sims
+_THE_OPENSIM_BIN_FOLDER_DOES_NOT_EXIST="The opensim bin folder does not exist"
 _MAX_10_SIMS_PER_USER="Maximum 10 sims per user"
 _THE_SIMULATOR_CONSOLE="The simulator console"
 _THERE_ARE_NO_SIM_FOLDERS_INSIDE="There are no sim folders inside"

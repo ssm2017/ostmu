@@ -10,13 +10,13 @@ declare -a WINDOW=()
 declare -a NO_WINDOW=()
 
 # check if the config folder exists
-if [ ! -d "$OPENSIM_LOCAL_CONFIG_FOLDER" ]; then
-  print_message "${_THE_FOLDER} ${OPENSIM_LOCAL_CONFIG_FOLDER} ${_DOES_NOT_EXIST}" "error"
+if [ ! -d "$USER_CONFIG_FOLDER_PATH" ]; then
+  print_message "${_THE_FOLDER} ${USER_CONFIG_FOLDER_PATH} ${_DOES_NOT_EXIST}" "error"
   exit 1;
 fi
 
 # get the .sim folders in config
-cd "${OPENSIM_LOCAL_CONFIG_FOLDER}"
+cd "${USER_CONFIG_FOLDER_PATH}"
 for i in *.sim;do
   if [ -d $i ]; then
     fullname=$(basename "$i")
@@ -30,7 +30,7 @@ done
 # check if there are ini files
 sim_folders_qty=${#SIM_NAMES[@]}
 if [ ${sim_folders_qty} -eq 0 ]; then
-  print_message "${_THERE_ARE_NO_SIM_FOLDERS_INSIDE} ${OPENSIM_LOCAL_CONFIG_FOLDER}." "error"
+  print_message "${_THERE_ARE_NO_SIM_FOLDERS_INSIDE} ${USER_CONFIG_FOLDER_PATH}." "error"
   exit 1;
 fi
 
@@ -57,7 +57,7 @@ for simname in "${SIM_NAMES[@]}"; do
     print_message "${_THE_TMUX_WINDOW} ${simname} ${_EXISTS}." "ok"
     WINDOW=("${WINDOW[@]}" "${simname}");
   else
-    print_message "${_THE_TMUX_WINDOW}The ${simname} ${_DOES_NOT_EXIST}." "notok"
+    print_message "${_THE_TMUX_WINDOW} ${simname} ${_DOES_NOT_EXIST}." "notok"
     NO_WINDOW=("${NO_WINDOW[@]}" "${simname}");
   fi
 done

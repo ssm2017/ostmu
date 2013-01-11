@@ -12,8 +12,11 @@ Installation
     - create_sim_files
     - ostmu
 
-  - Check the options in the file :
-    - ostmu/etc/config
+  - Rename the file ostmu/etc/config.example to ostmu/etc/config
+
+  - Check the options in the file ostmu/etc/config
+
+  - Check the ostmu/models files (the strings surrounded by <[ ]> will be replaced by variables)
    
   - run the file named "install"
 
@@ -29,6 +32,8 @@ followed by the system user name and the sim name.
 ex :
 
     create_sim_files foo mysim
+
+This script is not taking care about the mysql config so if the OpenSim.ini model file is using mysql, you should change again the values in the OpenSim.ini located in the user folder.
 
 Run a simulator
 ---------------
