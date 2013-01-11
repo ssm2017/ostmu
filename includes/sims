@@ -6,10 +6,10 @@
 simulator_folder_exists() {
   SIM_FOLDER="/home/${1}/.opensim/${2}.sim"
   if [ -d "${SIM_FOLDER}" ];then
-    echo "Folder ${SIM_FOLDER} exists."
+    print_message "${_FOLDER} ${SIM_FOLDER} ${_EXISTS}." "ok"
     return 0;
   else
-    echo "Folder ${SIM_FOLDER} does not exist."
+    print_message "${_FOLDER} ${SIM_FOLDER} ${_DOES_NOT_EXIST}." "notok"
     return 1;
   fi
 }
@@ -19,10 +19,10 @@ simulator_folder_exists() {
 # $2 Sim name
 get_sim_pid() {
   if [ -f "/home/${1}/.opensim/${2}.sim/temp/${2}.pid" ]; then
-    cat "/home/${1}/.opensim/${2}.sim/temp/${2}.pid"
+    print_message "/home/${1}/.opensim/${2}.sim/temp/${2}.pid ${_FOUND}" "ok"
     return 0;
   else
-    echo "Pid file not found."
+    print_message "${_PID_FILE} ${_NOT_FOUND}." "notok"
     return 1;
   fi
 }

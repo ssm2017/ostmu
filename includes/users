@@ -4,10 +4,10 @@
 # $1 User name
 user_exists() {
   if [ $(id -u ${1} 2>/dev/null) ]; then
-    echo "User ${1} exists."
+    print_message "${_THE_USER} ${1} ${_EXISTS}." "ok"
     return 0;
   else
-    echo "User ${1} does not exist."
+    print_message "${_THE_USER} ${1} ${_DOES_NOT_EXIST}." "notok"
     return 1;
   fi
 }

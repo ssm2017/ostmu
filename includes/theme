@@ -37,3 +37,30 @@ SymbolNotOk="${ColRedF}${ColReset} "
 LOG_CONFIG="[CONFIG] "
 LOG_TMUX_SESSION="[TMUX SESSION] "
 LOG_TMUX_WINDOW="[TMUX WINDOW] "
+
+# display message
+# $1 message
+# $2 level
+print_message() {
+  case "$2" in
+    ok)
+      echo -e "${SymbolOk}$1"
+    ;;
+
+    notok)
+      echo -e "${SymbolNotOk}$1"
+    ;;
+
+    error)
+      echo -e "${ColRedF}$1${ColReset}"
+    ;;
+
+    question)
+      echo -e "${ColYellowF}$1${ColReset}"
+    ;;
+
+    *)
+      echo "$1"
+    ;;
+  esac
+}

@@ -1,46 +1,8 @@
 #! /bin/bash
 
-#~ /home/username/.opensim
-#~ └── sim1.sim
-    #~ ├── config-include
-    #~ │   ├── GridCommon.ini
-    #~ │   └── GridHypergrid.ini
-    #~ ├── log
-    #~ │   └── sim1.log
-    #~ │   └── OpenSim.log
-    #~ ├── OpenSim.exe.config
-    #~ ├── OpenSim.ini
-    #~ └── regions
-        #~ └── Regions.ini
-#~ available ports from 1024 to 49151 = 48127 ports available
-#~ 48000 - 10000 = 38000 ports available / 100 = 380 users
-#~ user1 = 10 100
-#~ sim0 = 10 100
-#~ region0 = 10 101
-#~ region0 = 10 109
-#~ sim1 = 10 110
-#~ region1 = 10 111
-#~ region9 = 10 119
-#~ sim2 = 10 120
-#~ region1 = 10 121
-#~ region9 = 10 129
-#~ sim3 = 10 130
-#~ region1 = 10 131
-#~ region9 = 10 139
-#~ sim9 = 10 190
-#~ region1 = 10 191
-#~ region9 = 10 199
-#~ so : 9 regions per sim and 10 sims per user = 90 regions per user...
-#~ user2 = 10 200
-#~ user9 = 10 900
-#~ user10 = 11 000
-#~ user11 = 11 100
-#~ user99 = 19 900
-#~ user100 = 20 000
-
 # include the config
-OPENSIM_SCRIPT_FOLDER="/opt/opensim/scripts"
-source "${OPENSIM_SCRIPT_FOLDER}/etc/config"
+OSTMU_FOLDER="/opt/ostmu"
+source "${OSTMU_FOLDER}/etc/config"
 
 # define some vars
 USER_NAME=$1
@@ -49,12 +11,12 @@ USER_PORT="0"
 SIM_PORT="0"
 
 show_help() {
-  echo "Usage : create_sim <user_name> <sim_name>"
+  print_message "${_USAGE} : create_sim <user_name> <sim_name>"
   exit;
 }
 
 add_file() {
-  cat "${OPENSIM_INI_MODELS_FOLDER}/$1" | \
+  cat "${OSTMU_INI_MODELS_FOLDER}/$1" | \
   sed -e 's/<\[user_name\]>/'${USER_NAME}'/g' \
   -e 's/<\[sim_name\]>/'${SIM_NAME}'/g' \
   -e 's/<\[sim_port\]>/'${SIM_PORT}'/g' > $2
@@ -62,9 +24,9 @@ add_file() {
 
 get_next_available_user_port() {
   # remove empty lines in file
-  sed -i '/^$/d' "${OPENSIM_PORTS_FILE}"
+  sed -i '/^$/d' "${OSTMU_PORTS_FILE}"
   # count lines
-  users_qty=$(wc -l < "${OPENSIM_PORTS_FILE}")
+  users_qty=$(wc -l < "${OSTMU_PORTS_FILE}")
   next_user_nbr=$((${users_qty} + 1))
   if [ ${next_user_nbr} -lt 10 ];then
     USER_PORT="10${next_user_nbr}00"
@@ -75,18 +37,18 @@ get_next_available_user_port() {
       USER_PORT="1${next_user_nbr}00"
     fi
   fi
-  echo "${USER_NAME};${USER_PORT}" >> "${OPENSIM_PORTS_FILE}"
+  echo "${USER_NAME};${USER_PORT}" >> "${OSTMU_PORTS_FILE}"
 }
 
 create_sim_files() {
   # count user sim folders
   sim_files_qty=$(find ${USER_OPENSIM_FOLDER} -type d -name "*.sim" | wc -l)
   if [ ${sim_files_qty} -gt 9 ];then
-    echo -e "${ColRedF}Maximum 10 sims per user.${ColReset}"
+    print_message "${_MAX_10_SIMS_PER_USER}" "error"
     exit;
   fi
   # get the user port
-  user_port_line=$(grep "^${USER_NAME}" "${OPENSIM_PORTS_FILE}")
+  user_port_line=$(grep "^${USER_NAME}" "${OSTMU_PORTS_FILE}")
   if [ "${user_port_line}" ];then
     # get the user port
     USER_PORT=$(echo "${user_port_line}" | cut -d ";" -f2)
@@ -126,29 +88,29 @@ fi
 
 # check if the user exists
 if user_exists ${USER_NAME} > /dev/null; then
-  echo -e "${ColGreenF}${SymbolOk}User ${USER_NAME} exists.${ColReset}"
+  print_message "${_THE_USER} ${USER_NAME} ${_EXISTS}." "ok"
 else
-  echo -e "${ColRedF}${SymbolNotOk}User ${USER_NAME} does not exist.${ColReset}"
+  print_message "${_THE_USER} ${USER_NAME} ${_DOES_NOT_EXIST}." "notok"
   exit 1;
 fi
 
 # check if the user opensim folder exists and if not, create it.
 USER_OPENSIM_FOLDER="/home/$USER_NAME/.opensim"
 if [ ! -d "${USER_OPENSIM_FOLDER}" ];then
-  echo -e "${ColRedF}Folder ${USER_OPENSIM_FOLDER} does not exist.${ColReset}"
-  echo "Creating folder."
+  print_message "${_THE_FOLDER} ${USER_OPENSIM_FOLDER} ${_DOES_NOT_EXIST}." "notok"
+  print_message "${_CREATING_THE_FOLDER}."
   mkdir -p "${USER_OPENSIM_FOLDER}"
   chown "${USER_NAME}":"${USER_NAME}" "${USER_OPENSIM_FOLDER}"
 else
-  echo -e "${ColGreenF}Folder ${USER_OPENSIM_FOLDER} exists.${ColReset}"
+  print_message "${_THE_FOLDER} ${USER_OPENSIM_FOLDER} ${_EXISTS}." "ok"
 fi
 
 # check if the simulator folder exists and if not, create it
 SIM_FOLDER="${USER_OPENSIM_FOLDER}/${SIM_NAME}.sim"
 if [ ! -d "${SIM_FOLDER}" ];then
-  echo -e "${ColRedF}Folder ${SIM_FOLDER} does not exist.${ColReset}"
-  echo "Creating folder"
+  print_message "${_THE_FOLDER} ${SIM_FOLDER} ${_DOES_NOT_EXIST}." "notok"
+  print_message "${_CREATING_THE_FOLDER}."
   create_sim_files "${SIM_FOLDER}"
 else
-  echo -e "${ColGreenF}Folder ${SIM_FOLDER} exists.${ColReset}"
+  print_message "${_THE_FOLDER} ${SIM_FOLDER} ${_EXISTS}." "ok"
 fi
