@@ -166,3 +166,6 @@ msgstr ""
 #: ostmu:91
 msgid "Starting the simulator"
 msgstr ""
+#: ostmu:100
+msgid "Do you want to see the session ?"
+msgstr ""

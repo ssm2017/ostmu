@@ -97,7 +97,7 @@ if [ ! "${#NO_WINDOW[@]}" -eq 0 ]; then
   fi
 fi
 
-echo -e ${ColYellowF} "Do you want to see the session ?" ${ColReset}
+echo -e ${ColYellowF} $"Do you want to see the session ?" ${ColReset}
 echo $"Enter y or n :"
 read attach_session
 

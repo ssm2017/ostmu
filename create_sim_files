@@ -25,7 +25,7 @@ show_help() {
 add_file() {
   cat "${OSTMU_INI_MODELS_FOLDER}/$1" | \
   sed -e 's/<\[user_name\]>/'${USER_NAME}'/g' \
-  -e 's/<\[grid_ip\]>/'${OPENSIM_GRID_IP}'/g' \
+  -e 's/<\[grid_ip\]>/'${OPENSIMULATOR_GRID_IP}'/g' \
   -e 's/<\[db_password\]>/'${DB_PASSWORD}'/g' \
   -e 's/<\[sim_name\]>/'${SIM_NAME}'/g' \
   -e 's/<\[sim_port\]>/'${SIM_PORT}'/g' > $2

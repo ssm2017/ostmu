@@ -46,5 +46,5 @@ run_simulator() {
   # start the log
   tmux -S "${TMUX_SOCKET_FOLDER}/os-${1}" send-keys -t "os-${1}":"${2}" "tmux pipe-pane -o -t os-${1}:${2} 'cat >> ${USER_CONFIG_FOLDER_PATH}/${2}.sim/log/tmux.log'" Enter
   # start the simulator
-  tmux -S "${TMUX_SOCKET_FOLDER}/os-${1}" send-keys -t "os-${1}":"${2}" "cd ${OPENSIM_FOLDER};MONO_ADDINS_REGISTRY=${USER_CONFIG_FOLDER_PATH}/${2}.sim/temp mono OpenSim.exe -logconfig=${USER_CONFIG_FOLDER_PATH}/${2}.sim/OpenSim.exe.config -inifile=${USER_CONFIG_FOLDER_PATH}/${2}.sim/OpenSim.ini" Enter
+  tmux -S "${TMUX_SOCKET_FOLDER}/os-${1}" send-keys -t "os-${1}":"${2}" "cd ${OPENSIMULATOR_FOLDER};MONO_ADDINS_REGISTRY=${USER_CONFIG_FOLDER_PATH}/${2}.sim/temp mono OpenSim.exe -logconfig=${USER_CONFIG_FOLDER_PATH}/${2}.sim/OpenSim.exe.config -inifile=${USER_CONFIG_FOLDER_PATH}/${2}.sim/OpenSim.ini" Enter
 }

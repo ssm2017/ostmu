@@ -238,3 +238,7 @@ msgstr "Création de la fenêtre: ${simname}"
 msgid "Starting the simulator"
 msgstr "Démarrage du simulateur"
 
+#: ostmu:100
+msgid "Do you want to see the session ?"
+msgstr "Voulez vous voir la session ?"
+
