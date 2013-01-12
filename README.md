@@ -1,3 +1,5 @@
+This code is released under the GNU General Public License. See LICENSE.txt.
+
 Here is a set of bash scripts made under **Ubuntu** to use multiple **OpenSimulator** instances by multiple system users using **Tmux**.
 
 Note that these scripts are for testing only and not pretending to be fully functionnal.
