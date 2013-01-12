@@ -1,5 +1,11 @@
 #! /bin/bash
 
+# check if root
+if [[ $EUID -ne 0 ]]; then
+   echo $"This script must be run as root" 1>&2
+   exit 1
+fi
+
 # include the config
 OSTMU_FOLDER="/opt/ostmu"
 source "${OSTMU_FOLDER}/etc/config"
@@ -12,7 +18,7 @@ SIM_PORT="0"
 DB_PASSWORD=`date | md5sum | cut -c1-8`
 
 show_help() {
-  print_message "${_USAGE} : create_sim <user_name> <sim_name>"
+  echo $"Usage : create_sim <user_name> <sim_name>"
   exit;
 }
 
@@ -91,9 +97,9 @@ fi
 
 # check if the user exists
 if user_exists ${USER_NAME} > /dev/null; then
-  print_message "${_THE_USER} ${USER_NAME} ${_EXISTS}." "ok"
+  echo -e ${SymbolOk} $"The user ${USER_NAME} exists."
 else
-  print_message "${_THE_USER} ${USER_NAME} ${_DOES_NOT_EXIST}." "error"
+  echo -e ${SymbolNotOk} $"The user ${USER_NAME} does not exist."
   exit 1;
 fi
 
@@ -103,10 +109,10 @@ if [ ! -d "/var/lib/ostmu" ]; then
   if [ ! $? -eq 0 ]; then
     exit 1;
   else
-    print_message "${_THE_FOLDER} /var/lib/ostmu ${_EXISTS}" "ok"
+    echo -e ${SymbolOk} $"The folder /var/lib/ostmu was created."
   fi
 else
-  print_message "${_THE_FOLDER} /var/lib/ostmu ${_EXISTS}" "ok"
+  echo -e ${SymbolOk} $"The folder /var/lib/ostmu exists."
 fi
 
 # check if the port file exists and if not, create it
@@ -115,15 +121,15 @@ if [ ! -f ${OSTMU_PORTS_FILE} ]; then
   if [ ! $? -eq 0 ]; then
     exit 1;
   else
-    print_message "${_THE_FILE} ${OSTMU_PORTS_FILE} ${_EXISTS}" "ok"
+    echo -e ${SymbolOk} $"The file ${OSTMU_PORTS_FILE} was created."
   fi
 else
-  print_message "${_THE_FILE} ${OSTMU_PORTS_FILE} ${_EXISTS}" "ok"
+  echo -e ${SymbolOk} $"The file ${OSTMU_PORTS_FILE} exists."
 fi
 
 # check if the ports file is writable
 if [ ! -w ${OSTMU_PORTS_FILE} ]; then
-  print_message "${_THE_PORTS_FILE_IS_NOT_WRITABLE}" "error"
+  echo -e ${SymbolOk} $"The ports file is not writable"
   exit 1;
 fi
 
@@ -132,13 +138,17 @@ if [ ! -d "${USER_CONFIG_FOLDER_PATH}" ];then
   mkdir -p "${USER_CONFIG_FOLDER_PATH}"
   if [ ! $? -eq 0 ]; then
     exit 1;
+  else
+    echo -e ${SymbolOk} $"The folder ${USER_CONFIG_FOLDER_PATH} was created."
   fi
   chown "${USER_NAME}":"${USER_NAME}" "${USER_CONFIG_FOLDER_PATH}"
   if [ ! $? -eq 0 ]; then
     exit 1;
+  else
+    echo -e ${SymbolOk} $"The ownership of the folder ${USER_CONFIG_FOLDER_PATH} was set to ${USER_NAME}":"${USER_NAME}."
   fi
 else
-  print_message "${_THE_FOLDER} ${USER_CONFIG_FOLDER_PATH} ${_EXISTS}." "ok"
+  echo -e ${SymbolOk} $"The folder ${USER_CONFIG_FOLDER_PATH} exists."
 fi
 
 if [ ${USE_MYSQL} == 1 ]; then
@@ -149,10 +159,14 @@ if [ ${USE_MYSQL} == 1 ]; then
     echo ${DB_PASSWORD} > "${USER_CONFIG_FOLDER_PATH}/db_pass"
     if [ ! $? -eq 0 ]; then
       exit 1;
+    else
+      echo -e ${SymbolOk} $"The file ${USER_CONFIG_FOLDER_PATH}/db_pass was created."
     fi
     chown "${USER_NAME}":"${USER_NAME}" "${USER_CONFIG_FOLDER_PATH}/db_pass"
     if [ ! $? -eq 0 ]; then
       exit 1;
+    else
+      echo -e ${SymbolOk} $"The ownership of the file ${USER_CONFIG_FOLDER_PATH}/db_pass was set to ${USER_NAME}":"${USER_NAME}."
     fi
   fi
 
@@ -163,9 +177,9 @@ if [ ${USE_MYSQL} == 1 ]; then
   mysql_check_if_user_exists ${USER_NAME};
   if [ $? -eq 0 ]; then
     mysql_create_user ${USER_NAME} ${DB_PASSWORD}
-    print_message "${_THE_USER} ${USER_NAME} ${_EXISTS} ${_IN_THE_DATABASE}." "ok"
+    echo -e ${SymbolOk} $"The user ${USER_NAME} was created in the database."
   else
-    print_message "${_THE_USER} ${USER_NAME} ${_EXISTS} ${_IN_THE_DATABASE}." "ok"
+    echo -e ${SymbolOk} $"The user ${USER_NAME} exists in the database."
   fi
 
   # create the database
@@ -176,7 +190,7 @@ fi
 SIM_FOLDER="${USER_CONFIG_FOLDER_PATH}/${SIM_NAME}.sim"
 if [ ! -d "${SIM_FOLDER}" ];then
   create_sim_files "${SIM_FOLDER}"
-  print_message "${_THE_FOLDER} ${SIM_FOLDER} ${_EXISTS}." "ok"
+  echo -e ${SymbolOk} $"The folder ${SIM_FOLDER} was created."
 else
-  print_message "${_THE_FOLDER} ${SIM_FOLDER} ${_EXISTS}." "ok"
+  echo -e ${SymbolOk} $"The folder ${SIM_FOLDER} exists."
 fi

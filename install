@@ -1,17 +1,21 @@
 #! /bin/bash
 
-# define some vars
+# check if root
+if [[ $EUID -ne 0 ]]; then
+   echo $"This script must be run as root." 1>&2
+   exit 1
+fi
+
+# include the config
 OSTMU_FOLDER="/opt/ostmu"
 source "${OSTMU_FOLDER}/etc/config"
 
-
-# check if the opensim bin files exist
-if [ ! -d "${OPENSIM_FOLDER}" ];then
-  print_message "${_THE_OPENSIM_BIN_FOLDER_DOES_NOT_EXIST}" "error"
+# check if the opensimulator bin files exist
+if [ ! -d "${OPENSIMULATOR_FOLDER}" ];then
+  echo -e ${SymbolNotOk} $"The opensimulator bin folder does not exist."
   exit 1;
-else
-  print_message "${_THE_OPENSIM_BIN_FOLDER_EXISTS}" "ok"
 fi
+echo -e ${SymbolOk} $"The opensimulator bin folder exists."
 
 # check if the socket folder exist
 if [ ! -d "${TMUX_SOCKET_FOLDER}" ]; then
@@ -19,10 +23,10 @@ if [ ! -d "${TMUX_SOCKET_FOLDER}" ]; then
   if [ ! $? -eq 0 ]; then
     exit 1;
   else
-    print_message "${_THE_FOLDER} ${TMUX_SOCKET_FOLDER} ${_EXISTS}." "ok"
+    echo -e ${SymbolOk} $"The folder ${TMUX_SOCKET_FOLDER} was created."
   fi
 else
-  print_message "${_THE_FOLDER} ${TMUX_SOCKET_FOLDER} ${_EXISTS}." "ok"
+  echo -e ${SymbolOk} $"The folder ${TMUX_SOCKET_FOLDER} exists."
 fi
 
 # check ig the socket folder has the good group ownership
@@ -31,10 +35,10 @@ if [ $(stat -c %G "${TMUX_SOCKET_FOLDER}") != "${TMUX_SOCKET_FOLDER_GROUP_NAME}"
   if [ ! $? -eq 0 ]; then
     exit 1;
   else
-    print_message "${_THE_FOLDER} ${TMUX_SOCKET_FOLDER} ${_HAVE_GOOD_GROUP_OWNERSHIP}." "ok"
+    echo -e ${SymbolOk} $"Group ownership changed for folder ${TMUX_SOCKET_FOLDER}."
   fi
 else
-  print_message "${_THE_FOLDER} ${TMUX_SOCKET_FOLDER} ${_HAVE_GOOD_GROUP_OWNERSHIP}." "ok"
+  echo -e ${SymbolOk} $"The folder ${TMUX_SOCKET_FOLDER} has good group ownership."
 fi
 
 # check if the socket folder is writable to everyone
@@ -43,8 +47,8 @@ if [ ! $(stat -c %a "${TMUX_SOCKET_FOLDER}") = "2770" ]; then
   if [ ! $? -eq 0 ]; then
     exit 1;
   else
-    print_message "${_THE_PERMISSIONS_OF} ${TMUX_SOCKET_FOLDER} ${_ARE} 2770" "ok"
+    echo -e ${SymbolOk} $"The permissions were set to 2770 for the folder ${TMUX_SOCKET_FOLDER}."
   fi
 else
-  print_message "${_THE_PERMISSIONS_OF} ${TMUX_SOCKET_FOLDER} ${_ARE} 2770" "ok"
+  echo -e ${SymbolOk} $"The permissions of the folder ${TMUX_SOCKET_FOLDER} are 2770."
 fi

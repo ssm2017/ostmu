@@ -5,10 +5,8 @@
 check_pid() {
   #~ if [ $(ps -a | grep "${1}" | cut -d " " -f1) = ${1} ];then
   if [ -e /proc/${1} ]; then
-    print_message "pid ${_IS_RUNNING}." "ok"
     return 0;
   else
-    print_message "pid ${_IS_NOT_RUNNING}." "notok"
     return 1;
   fi
 }

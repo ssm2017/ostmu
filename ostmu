@@ -11,7 +11,7 @@ declare -a NO_WINDOW=()
 
 # check if the config folder exists
 if [ ! -d "$USER_CONFIG_FOLDER_PATH" ]; then
-  print_message "${_THE_FOLDER} ${USER_CONFIG_FOLDER_PATH} ${_DOES_NOT_EXIST}" "error"
+  echo -e ${SymbolNotOk} $"The folder ${USER_CONFIG_FOLDER_PATH} does not exist."
   exit 1;
 fi
 
@@ -22,7 +22,7 @@ for i in *.sim;do
     fullname=$(basename "$i")
     #~ extension="${fullname##*.}"
     shortname="${fullname%.*}"
-    print_message "${_THE_FILE} ${fullname} ${_EXISTS}."
+    echo -e ${SymbolOk} $"The file ${fullname} exists."
     SIM_NAMES=("${SIM_NAMES[@]}" "${shortname}")
   fi
 done
@@ -30,22 +30,20 @@ done
 # check if there are ini files
 sim_folders_qty=${#SIM_NAMES[@]}
 if [ ${sim_folders_qty} -eq 0 ]; then
-  print_message "${_THERE_ARE_NO_SIM_FOLDERS_INSIDE} ${USER_CONFIG_FOLDER_PATH}." "error"
+  echo -e ${SymbolNotOk} $"There are no .sim folders inside ${USER_CONFIG_FOLDER_PATH}."
   exit 1;
 fi
-
-print_message "${_THERE_ARE} ${sim_folders_qty} ${_SIM_FOLDERS_INSIDE_YOUR_OPENSIM_FOLDER}."
 
 # check if there is a session for the user
 session_name=os-${USER}
 if tmux_session_exists ${session_name}; then
-  print_message "${_YOUR_USER_SESSION} : "${session_name}" ${_IS_RUNNING}." "ok"
+  echo -e ${SymbolOk} $"Your user session : "${session_name}" is running."
 else
-  print_message "${_YOUR_USER_SESSION} ${_IS_NOT_RUNNING}." "notok"
-  print_message "${_DO_YOU_WANT_TO_CREATE_YOUR_USER_SESSION} ?" "question"
-  read -p "${_ENTER_Y_OR_N} :"
+  echo -e ${SymbolNotOk} $"Your user session is not running."
+  echo -e ${ColYellowF} $"Do you want to create your user session ?" ${ColReset}
+  read -p $"Enter y or n :"
   if [ "$REPLY" == "y" ]; then
-    print_message "${_CREATING_YOUR_USER_SESSION}."
+    echo $"Creating your user session."
     tmux -S "${TMUX_SOCKET_FOLDER}/${session_name}" new-session -s "${session_name}" -d
   else
     exit 0;
@@ -54,33 +52,33 @@ fi
 
 for simname in "${SIM_NAMES[@]}"; do
   if tmux_window_exists ${session_name} ${simname}; then
-    print_message "${_THE_TMUX_WINDOW} ${simname} ${_EXISTS}." "ok"
+    echo -e ${SymbolOk} $"The tmux window ${simname} exists."
     WINDOW=("${WINDOW[@]}" "${simname}");
   else
-    print_message "${_THE_TMUX_WINDOW} ${simname} ${_DOES_NOT_EXIST}." "notok"
+    echo -e ${SymbolNotOk} $"The tmux window ${simname} does not exist."
     NO_WINDOW=("${NO_WINDOW[@]}" "${simname}");
   fi
 done
 
-print_message "${#WINDOW[@]} ${_RUNNING_SIMULATORS}."
-print_message "${#NO_WINDOW[@]} ${_NON_RUNNING_SIMULATORS}."
+echo $"${#WINDOW[@]} running simulators."
+echo $"${#NO_WINDOW[@]} non running simulators."
 
 if [ ! "${#NO_WINDOW[@]}" -eq 0 ]; then
-  print_message "${_DO_YOU_WANT_TO_START_A_NEW_SIMULATOR} ?" "question"
-  print_message "${_ENTER_Y_OR_N} :"
+  echo -e ${ColYellowF} $"Do you want to start a new simulator ?" ${ColReset}
+  echo $"Enter y or n :"
   read start_sim
   if [ "$start_sim" == "y" ]; then
-    echo "${_AVAILABLE_SIMULATORS} :"
+    echo $"available simulators :"
     i=0
     for simname in "${NO_WINDOW[@]}"; do
       i=$((i+1))
       echo "$i/ ${simname}"
     done
-    print_message "${_WHAT_SIMULATOR_DO_YOU_WANT_TO_START} ?" "question"
-    print_message "${_ENTER_A_NUMBER} :"
+    echo -e ${ColYellowF} $"What simulator do you want to start ?" ${ColReset}
+    echo $"Enter a number :"
     read answer
     if ! [[ "$answer" =~ ^[0-9]+$ ]] ; then
-      print_message "${_WRONG_ANWSER}" "error"
+      echo -e ${SymbolNotOk} $"Wrong answer. Good bye."
       exit 1;
     fi
     if [ "$answer" -eq 0 ]; then
@@ -88,19 +86,19 @@ if [ ! "${#NO_WINDOW[@]}" -eq 0 ]; then
     fi
     if [[ "${NO_WINDOW[($answer - 1)]}" ]]; then
       simname="${NO_WINDOW[($answer - 1)]}"
-      print_message "${_CREATING_THE_WINDOW} : ${simname}"
+      echo $"Creating the window : ${simname}"
       tmux -S "${TMUX_SOCKET_FOLDER}/${session_name}" new-window -t "${session_name}" -n "${simname}"
-      print_message "${_STARTING_THE_SIMULATOR}"
+      echo $"Starting the simulator"
       run_simulator "${USER}" "${simname}"
     else
-      print_message "${_WRONG_ANWSER} : $answer"
+      echo -e ${SymbolNotOk} $"Wrong answer. Good bye."
       exit 1;
     fi
   fi
 fi
 
-print_message "${_DO_YOU_WANT_TO_SEE_THE_SESSION} ?" "question"
-print_message "${_ENTER_Y_OR_N} :"
+echo -e ${ColYellowF} "Do you want to see the session ?" ${ColReset}
+echo $"Enter y or n :"
 read attach_session
 
 if [ "$attach_session" == "y" ]; then

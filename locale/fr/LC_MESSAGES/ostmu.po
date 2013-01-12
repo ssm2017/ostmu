@@ -1,0 +1,240 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ostmu\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: ssm2017 <ssm2017.binder@gmail.com>\n"
+"Language-Team: \n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: French\n"
+"X-Poedit-Country: FRANCE\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: install:5
+msgid "This script must be run as root."
+msgstr "Ce script doit être exécuté en tant que root."
+
+#: install:15
+msgid "The opensimulator bin folder does not exist."
+msgstr "Le dossier bin de opensimulator n'existe pas."
+
+#: install:18
+msgid "The opensimulator bin folder exists."
+msgstr "Le dossier bin de opensimulator existe"
+
+#: install:26
+msgid "The folder ${TMUX_SOCKET_FOLDER} was created."
+msgstr "Le dossier ${TMUX_SOCKET_FOLDER} a été créé."
+
+#: install:29
+msgid "The folder ${TMUX_SOCKET_FOLDER} exists."
+msgstr "Le dossier ${TMUX_SOCKET_FOLDER} existe."
+
+#: install:38
+msgid "Group ownership changed for folder ${TMUX_SOCKET_FOLDER}."
+msgstr "La propriété du groupe pour le dossier ${TMUX_SOCKET_FOLDER} a été changée."
+
+#: install:41
+msgid "The folder ${TMUX_SOCKET_FOLDER} has good group ownership."
+msgstr "Le dossier ${TMUX_SOCKET_FOLDER} appartient au bon groupe."
+
+#: install:50
+msgid "The permissions were set to 2770 for the folder ${TMUX_SOCKET_FOLDER}."
+msgstr "Les permissions pour le dossier ${TMUX_SOCKET_FOLDER} ont été définies sur 2770."
+
+#: install:53
+msgid "The permissions of the folder ${TMUX_SOCKET_FOLDER} are 2770."
+msgstr "Les permissions sur le dossier ${TMUX_SOCKET_FOLDER} sont 2770."
+
+#: create_sim_files:21
+msgid "Usage : create_sim <user_name> <sim_name>"
+msgstr "Utilisation : create_sim <user_name> <sim_name>"
+
+#: create_sim_files:100
+msgid "The user ${USER_NAME} exists."
+msgstr "L'utilisateur ${USER_NAME} existe."
+
+#: create_sim_files:102
+msgid "The user ${USER_NAME} does not exist."
+msgstr "L'utilisateur ${USER_NAME} n'existe pas."
+
+#: create_sim_files:112
+msgid "The folder /var/lib/ostmu was created."
+msgstr "Le dossier /var/lib/ostmu a été créé."
+
+#: create_sim_files:115
+msgid "The folder /var/lib/ostmu exists."
+msgstr "Le dossier /var/lib/ostmu existe."
+
+#: create_sim_files:124
+msgid "The file ${OSTMU_PORTS_FILE} was created."
+msgstr "Le fichier ${OSTMU_PORTS_FILE} a été créé."
+
+#: create_sim_files:127
+msgid "The file ${OSTMU_PORTS_FILE} exists."
+msgstr "Le fichier ${OSTMU_PORTS_FILE} existe."
+
+#: create_sim_files:132
+msgid "The ports file is not writable"
+msgstr "Le fichier des ports n'est pas accessible en écriture."
+
+#: create_sim_files:142
+msgid "The folder ${USER_CONFIG_FOLDER_PATH} was created."
+msgstr "Le dossier ${USER_CONFIG_FOLDER_PATH} a été créé."
+
+#: create_sim_files:148
+msgid "The ownership of the folder ${USER_CONFIG_FOLDER_PATH} was set to ${USER_NAME}"
+msgstr "La propriété du dossier ${USER_CONFIG_FOLDER_PATH} a été définie sur ${USER_NAME}"
+
+#: create_sim_files:151
+msgid "The folder ${USER_CONFIG_FOLDER_PATH} exists."
+msgstr "Le dossier  ${USER_CONFIG_FOLDER_PATH} existe."
+
+#: create_sim_files:163
+msgid "The file ${USER_CONFIG_FOLDER_PATH}/db_pass was created."
+msgstr "Le fichier ${USER_CONFIG_FOLDER_PATH}/db_pass a été créé."
+
+#: create_sim_files:169
+msgid "The ownership of the file ${USER_CONFIG_FOLDER_PATH}/db_pass was set to ${USER_NAME}"
+msgstr "La propriété du fichier ${USER_CONFIG_FOLDER_PATH}/db_pass a été définie sur ${USER_NAME}"
+
+#: create_sim_files:180
+msgid "The user ${USER_NAME} was created in the database."
+msgstr "L'utilisateur ${USER_NAME} a été créé dans la base de données."
+
+#: create_sim_files:182
+msgid "The user ${USER_NAME} exists in the database."
+msgstr "L'utilisateur ${USER_NAME} existe dans la base de données."
+
+#: create_sim_files:193
+msgid "The folder ${SIM_FOLDER} was created."
+msgstr "Le dossier ${SIM_FOLDER} a été créé."
+
+#: create_sim_files:195
+msgid "The folder ${SIM_FOLDER} exists."
+msgstr "Le dossier ${SIM_FOLDER} existe."
+
+#: check_sim:12
+msgid "Usage : check_sim <user_name> <sim_name>"
+msgstr "Utilisation : check_sim <user_name> <sim_name>"
+
+#: check_sim:34
+msgid "The folder ${SIM_FOLDER} does not exist."
+msgstr "Le dossier ${SIM_FOLDER} n'existe pas."
+
+#: check_sim:43
+msgid "PID is running."
+msgstr "Le PID s'exécute."
+
+#: check_sim:45
+msgid "PID is not running."
+msgstr "Le PID ne s'exécute pas."
+
+#: check_sim:48
+msgid "The file PID does not exist."
+msgstr "Le fichier PID n'existe pas."
+
+#: check_sim:54
+msgid "The tmux session is running."
+msgstr "La session tmux s'exécute."
+
+#: check_sim:56
+msgid "The tmux session is not running."
+msgstr "La session tmux ne s'exécute pas."
+
+#: check_sim:61
+msgid "The tmux window is running."
+msgstr "La fenêtre tmux s'exécute."
+
+#: check_sim:63
+msgid "The tmux window is not running."
+msgstr "La fenêtre tmux ne s'exécute pas."
+
+#: check_sim:69
+msgid "The simulator console is answering."
+msgstr "La console du simulateur répond."
+
+#: check_sim:71
+msgid "The simulator console is not answering."
+msgstr "La console du simulateur ne répond pas."
+
+#: ostmu:14
+msgid "The folder ${USER_CONFIG_FOLDER_PATH} does not exist."
+msgstr "Le dossier ${USER_CONFIG_FOLDER_PATH} existe."
+
+#: ostmu:25
+msgid "The file ${fullname} exists."
+msgstr "Le dossier ${SIM_FOLDER} existe."
+
+#: ostmu:33
+msgid "There are no .sim folders inside ${USER_CONFIG_FOLDER_PATH}."
+msgstr "Le dossier ${USER_CONFIG_FOLDER_PATH} existe."
+
+#: ostmu:40
+msgid "Your user session : "
+msgstr "Votre session utilisateur:"
+
+#: ostmu:42
+#, fuzzy
+msgid "Your user session is not running."
+msgstr "La session tmux ne s'exécute pas."
+
+#: ostmu:43
+msgid "Do you want to create your user session ?"
+msgstr "Voulez vous créer votre session utilisateur ?"
+
+#: ostmu:44
+msgid "Enter y or n :"
+msgstr "Entrez y ou n:"
+
+#: ostmu:46
+msgid "Creating your user session."
+msgstr "Creation de votre session utilisateur."
+
+#: ostmu:55
+msgid "The tmux window ${simname} exists."
+msgstr "La fenêtre tmux s'exécute."
+
+#: ostmu:58
+msgid "The tmux window ${simname} does not exist."
+msgstr "La fenêtre tmux ne s'exécute pas."
+
+#: ostmu:63
+msgid "${#WINDOW[@]} running simulators."
+msgstr "${#WINDOW[@]} simulateurs en marche."
+
+#: ostmu:64
+msgid "${#NO_WINDOW[@]} non running simulators."
+msgstr "${#NO_WINDOW[@]} simulateurs arrétés."
+
+#: ostmu:67
+msgid "Do you want to start a new simulator ?"
+msgstr "Voulez vous démarrer un nouveau simulateur ?"
+
+#: ostmu:71
+msgid "available simulators :"
+msgstr "simulateurs disponibles:"
+
+#: ostmu:77
+msgid "What simulator do you want to start ?"
+msgstr "Quel simulateur voulez vous démarrer ?"
+
+#: ostmu:78
+msgid "Enter a number :"
+msgstr "Entrez un nombre:"
+
+#: ostmu:81
+msgid "Wrong answer. Good bye."
+msgstr "Mauvaise réponse. Au revoir."
+
+#: ostmu:89
+msgid "Creating the window : ${simname}"
+msgstr "Création de la fenêtre: ${simname}"
+
+#: ostmu:91
+msgid "Starting the simulator"
+msgstr "Démarrage du simulateur"
+

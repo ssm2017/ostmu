@@ -6,7 +6,7 @@ These scripts can Damage your system. Use them at your own risk.
 Installation
 ------------
 
-  - Check the path to ostmu at the top of the files :
+  - Check the path to ostmu for the variable OSTMU_FOLDER at the top of the files if the files are not located in /opt/ostmu :
     - install
     - check_sim
     - create_sim_files
@@ -18,12 +18,12 @@ Installation
 
   - Check the ostmu/models files (the strings surrounded by <[ ]> will be replaced by variables)
    
-  - run the file named "install"
+  - run the file named "install" (as root)
 
 Create a new simulator
 ----------------------
 
-Run the file named
+Run the file named (as root)
 
     create_sim_files
 
@@ -31,9 +31,7 @@ followed by the system user name and the sim name.
 
 ex :
 
-    create_sim_files foo mysim
-
-This script is not taking care about the mysql config so if the OpenSim.ini model file is using mysql, you should change again the values in the OpenSim.ini located in the user folder.
+    sudo create_sim_files foo mysim
 
 Run a simulator
 ---------------
@@ -53,12 +51,20 @@ ex :
 
     check_sim foo mysim
 
+Available variables for the models files
+----------------------------------------
+       <\[user_name\]>
+       <\[grid_ip\]>
+       <\[db_password\]>
+       <\[sim_name\]>
+       <\[sim_port\]>
+
 Files organization
 ------------------
 
 Here is the default files organization
 
-       /home/username/.opensim
+       /home/username/.opensimulator
        └── sim1.sim
            ├── config-include
            │   ├── GridCommon.ini

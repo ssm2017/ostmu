@@ -4,12 +4,10 @@
 # $1 User name
 # $2 Sim name
 simulator_folder_exists() {
-  SIM_FOLDER="/home/${1}/.opensim/${2}.sim"
+  SIM_FOLDER="/home/${1}/.opensimulator/${2}.sim"
   if [ -d "${SIM_FOLDER}" ];then
-    print_message "${_FOLDER} ${SIM_FOLDER} ${_EXISTS}." "ok"
     return 0;
   else
-    print_message "${_FOLDER} ${SIM_FOLDER} ${_DOES_NOT_EXIST}." "notok"
     return 1;
   fi
 }
@@ -18,26 +16,24 @@ simulator_folder_exists() {
 # $1 User name
 # $2 Sim name
 get_sim_pid() {
-  if [ -f "/home/${1}/.opensim/${2}.sim/temp/${2}.pid" ]; then
-    print_message "/home/${1}/.opensim/${2}.sim/temp/${2}.pid ${_FOUND}" "ok"
+  if [ -f "/home/${1}/.opensimulator/${2}.sim/temp/${2}.pid" ]; then
     return 0;
   else
-    print_message "${_PID_FILE} ${_NOT_FOUND}." "notok"
     return 1;
   fi
 }
 
-# get opensim version
+# get opensimulator version
 # $1 User name
 # $2 Sim name
 simulator_console_is_answering() {
-  log_file_size_before=$(stat -c%s "/home/${1}/.opensim/${2}.sim/log/tmux.log")
+  log_file_size_before=$(stat -c%s "/home/${1}/.opensimulator/${2}.sim/log/tmux.log")
   tmux -S "${TMUX_SOCKET_FOLDER}/os-${1}" send-keys -t "os-${1}":"${2}" " show version" Enter
-  log_file_size_after=$(stat -c%s "/home/${1}/.opensim/${2}.sim/log/tmux.log")
+  log_file_size_after=$(stat -c%s "/home/${1}/.opensimulator/${2}.sim/log/tmux.log")
   if [ ${log_file_size_before} = ${log_file_size_after} ]; then
     return 1;
   fi
-  tail -1 "/home/${1}/.opensim/${2}.sim/log/tmux.log" | grep "Region" > /dev/null
+  tail -1 "/home/${1}/.opensimulator/${2}.sim/log/tmux.log" | grep "Region" > /dev/null
   return $?;
 }
 

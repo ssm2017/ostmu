@@ -9,7 +9,7 @@ USER_NAME=$1
 SIM_NAME=$2
 
 show_help() {
-  print_message "${_USAGE} : check_sim <user_name> <sim_name>"
+  echo $"Usage : check_sim <user_name> <sim_name>"
   exit;
 }
 
@@ -21,53 +21,53 @@ fi
 
 # check if the user exists
 if user_exists ${USER_NAME} > /dev/null; then
-  print_message "${_THE_USER} ${USER_NAME} ${_EXISTS}." "ok"
+  echo -e ${SymbolOk} $"The user ${USER_NAME} exists."
 else
-  print_message "${_THE_USER} ${USER_NAME} ${_DOES_NOT_EXIST}." "notok"
+  echo -e ${SymbolNotOk} $"The user ${USER_NAME} does not exist."
   exit 1;
 fi
 
 # check if the simulator folder exists
 if simulator_folder_exists ${USER_NAME} ${SIM_NAME} > /dev/null;then
-  print_message "${_THE_FOLDER} ${SIM_FOLDER} ${_EXISTS}." "ok"
+  echo -e ${SymbolOk} $"The folder ${SIM_FOLDER} exists."
 else
-  print_message "${_THE_FOLDER} ${SIM_FOLDER} ${_DOES_NOT_EXIST}." "notok"
+  echo -e ${SymbolNotOk} $"The folder ${SIM_FOLDER} does not exist."
   exit 1;
 fi
 
 # check the simulator pid
 PID=$(get_sim_pid ${USER_NAME} ${SIM_NAME})
 if [ $? = 0 ]; then
-  print_message "${_THE_PID_FILE} ${_EXISTS}." "ok"
+  print_message "${_THE_PID_FILE} ${_EXISTS}."
   if check_pid ${PID} > /dev/null;then
-    print_message "${_PID_IS_RUNNING}." "ok"
+    echo -e ${SymbolOk} $"PID is running."
   else
-    print_message "${_PID_IS_NOT_RUNNING}." "notok"
+    echo -e ${SymbolNotOk} $"PID is not running."
   fi
 else
-  print_message "${_THE_PID_FILE} ${_DOES_NOT_EXIST}." "notok"
+  echo -e ${SymbolNotOk} $"The file PID does not exist."
   exit 1;
 fi
 
 # check if the tmux session is running
 if tmux_session_exists "os-${USER_NAME}"; then
-  print_message "${_THE_TMUX_SESSION} ${_IS_RUNNING}." "ok"
+  echo -e ${SymbolOk} $"The tmux session is running."
 else
-  print_message "${_THE_TMUX_SESSION} ${_IS_NOT_RUNNING}." "notok"
+  echo -e ${SymbolNotOk} $"The tmux session is not running."
 fi
 
 # check if the tmux window is running
 if tmux_window_exists "os-${USER_NAME}" "${SIM_NAME}"; then
-  print_message "${_THE_TMUX_WINDOW} ${_IS_RUNNING}." "ok"
+  echo -e ${SymbolOk} $"The tmux window is running."
 else
-  print_message "${_THE_TMUX_WINDOW} ${_IS_NOT_RUNNING}." "notok"
+  echo -e ${SymbolNotOk} $"The tmux window is not running."
   exit 1;
 fi
 
 # check if the console is answering
 if simulator_console_is_answering "${USER_NAME}" "${SIM_NAME}"; then
-  print_message "${_THE_SIMULATOR_CONSOLE} ${_IS_ANSWERING}." "ok"
+  echo -e ${SymbolOk} $"The simulator console is answering."
 else
-  print_message "${_THE_SIMULATOR_CONSOLE} ${_IS_NOT_ANSWERING}." "notok"
+  echo -e ${SymbolNotOk} $"The simulator console is not answering."
   exit 1;
 fi

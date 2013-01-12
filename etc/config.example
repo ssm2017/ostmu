@@ -1,21 +1,22 @@
 #! /bin/bash
 
 # lang
-source "${OSTMU_FOLDER}/includes/lang/en"
+TEXTDOMAIN=ostmu
+TEXTDOMAINDIR="${OSTMU_FOLDER}/locale"
 
-# opensim
-OPENSIM_FOLDER="/opt/opensim/bin"
-OPENSIM_BIN="${OPENSIM_FOLDER}/OpenSim.exe"
-OPENSIM_GRID_IP=127.0.0.1
+# opensimulator
+OPENSIMULATOR_FOLDER="/opt/opensim/bin"
+OPENSIMULATOR_BIN="${OPENSIM_FOLDER}/OpenSim.exe"
+OPENSIMULATOR_GRID_IP=127.0.0.1
 
 # tmux
-TMUX_SOCKET_FOLDER="/tmp/tmux/sockets/opensim"
+TMUX_SOCKET_FOLDER="/tmp/tmux/sockets/opensimulator"
 TMUX_SOCKET_FOLDER_GROUP_NAME="tmux-share"
 
 # ostmu
 OSTMU_INI_MODELS_FOLDER="${OSTMU_FOLDER}/models"
-OSTMU_PORTS_FILE="${OSTMU_FOLDER}/etc/ports"
-USER_CONFIG_FOLDER_NAME=".opensim"
+OSTMU_PORTS_FILE="/var/lib/ostmu/ports"
+USER_CONFIG_FOLDER_NAME=".opensimulator"
 
 # mysql
 USE_MYSQL=1
