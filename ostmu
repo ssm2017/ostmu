@@ -37,7 +37,7 @@ fi
 # check if there is a session for the user
 session_name=os-${USER}
 if tmux_session_exists ${session_name}; then
-  echo -e ${SymbolOk} $"Your user session : "${session_name}" is running."
+  echo -e ${SymbolOk} $"Your user session : ${session_name} is running."
 else
   echo -e ${SymbolNotOk} $"Your user session is not running."
   echo -e ${ColYellowF} $"Do you want to create your user session ?" ${ColReset}

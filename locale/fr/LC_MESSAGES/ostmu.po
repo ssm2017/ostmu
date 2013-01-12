@@ -174,13 +174,12 @@ msgid "There are no .sim folders inside ${USER_CONFIG_FOLDER_PATH}."
 msgstr "Le dossier ${USER_CONFIG_FOLDER_PATH} existe."
 
 #: ostmu:40
-msgid "Your user session : "
-msgstr "Votre session utilisateur:"
+msgid "Your user session : ${session_name} is running."
+msgstr "Votre session utilisateur : ${session_name} s'exécute."
 
 #: ostmu:42
-#, fuzzy
 msgid "Your user session is not running."
-msgstr "La session tmux ne s'exécute pas."
+msgstr "Votre session utilisateur ne s'exécute pas."
 
 #: ostmu:43
 msgid "Do you want to create your user session ?"

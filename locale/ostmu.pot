@@ -119,7 +119,7 @@ msgstr ""
 msgid "There are no .sim folders inside ${USER_CONFIG_FOLDER_PATH}."
 msgstr ""
 #: ostmu:40
-msgid "Your user session : "
+msgid "Your user session : ${session_name} is running."
 msgstr ""
 #: ostmu:42
 msgid "Your user session is not running."
