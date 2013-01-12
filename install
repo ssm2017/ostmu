@@ -9,15 +9,17 @@ source "${OSTMU_FOLDER}/etc/config"
 if [ ! -d "${OPENSIM_FOLDER}" ];then
   print_message "${_THE_OPENSIM_BIN_FOLDER_DOES_NOT_EXIST}" "error"
   exit 1;
+else
+  print_message "${_THE_OPENSIM_BIN_FOLDER_EXISTS}" "ok"
 fi
 
 # check if the socket folder exist
 if [ ! -d "${TMUX_SOCKET_FOLDER}" ]; then
-  print_message "${_THE_FOLDER} ${TMUX_SOCKET_FOLDER} ${_DOES_NOT_EXIST}." "notok"
   mkdir -p "${TMUX_SOCKET_FOLDER}"
-  if [ $? == 0 ]; then
-    print_message "${_ERROR_CREATING_FOLDER} : ${TMUX_SOCKET_FOLDER}" "error"
+  if [ ! $? -eq 0 ]; then
     exit 1;
+  else
+    print_message "${_THE_FOLDER} ${TMUX_SOCKET_FOLDER} ${_EXISTS}." "ok"
   fi
 else
   print_message "${_THE_FOLDER} ${TMUX_SOCKET_FOLDER} ${_EXISTS}." "ok"
@@ -25,11 +27,11 @@ fi
 
 # check ig the socket folder has the good group ownership
 if [ $(stat -c %G "${TMUX_SOCKET_FOLDER}") != "${TMUX_SOCKET_FOLDER_GROUP_NAME}" ]; then
-  print_message "${_THE_FOLDER} ${TMUX_SOCKET_FOLDER} ${_DOES_NOT_HAVE_GOOD_GROUP_OWNERSHIP}." "notok"
-  print_message "${_ASSIGNING_FOLDER_GROUP_TO} : ${TMUX_SOCKET_FOLDER_GROUP_NAME}"
   chown root:"${TMUX_SOCKET_FOLDER_GROUP_NAME}" "${TMUX_SOCKET_FOLDER}"
-  if [ $? != 0 ]; then
+  if [ ! $? -eq 0 ]; then
     exit 1;
+  else
+    print_message "${_THE_FOLDER} ${TMUX_SOCKET_FOLDER} ${_HAVE_GOOD_GROUP_OWNERSHIP}." "ok"
   fi
 else
   print_message "${_THE_FOLDER} ${TMUX_SOCKET_FOLDER} ${_HAVE_GOOD_GROUP_OWNERSHIP}." "ok"
@@ -37,10 +39,11 @@ fi
 
 # check if the socket folder is writable to everyone
 if [ ! $(stat -c %a "${TMUX_SOCKET_FOLDER}") = "2770" ]; then
-  print_message "${_THE_PERMISSIONS_OF} ${TMUX_SOCKET_FOLDER} ${_ARE_NOT} 2770" "notok"
   chmod 2770 "${TMUX_SOCKET_FOLDER}"
-  if [ $? != 0 ]; then
+  if [ ! $? -eq 0 ]; then
     exit 1;
+  else
+    print_message "${_THE_PERMISSIONS_OF} ${TMUX_SOCKET_FOLDER} ${_ARE} 2770" "ok"
   fi
 else
   print_message "${_THE_PERMISSIONS_OF} ${TMUX_SOCKET_FOLDER} ${_ARE} 2770" "ok"

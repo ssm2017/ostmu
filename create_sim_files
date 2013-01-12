@@ -93,44 +93,52 @@ fi
 if user_exists ${USER_NAME} > /dev/null; then
   print_message "${_THE_USER} ${USER_NAME} ${_EXISTS}." "ok"
 else
-  print_message "${_THE_USER} ${USER_NAME} ${_DOES_NOT_EXIST}." "notok"
+  print_message "${_THE_USER} ${USER_NAME} ${_DOES_NOT_EXIST}." "error"
   exit 1;
 fi
 
 # check for the config folder
 if [ ! -d "/var/lib/ostmu" ]; then
-  print_message "${_THE_OSTMU_CONFIG_FOLDER_DOES_NOT_EXIST}" "notok"
-  print_message "${_CREATING_THE_FOLDER}."
   mkdir -p "/var/lib/ostmu"
   if [ ! $? -eq 0 ]; then
-    print_message "${_THE_FOLDER} /var/lib ${_IS_NOT_WRITABLE}" "error"
     exit 1;
+  else
+    print_message "${_THE_FOLDER} /var/lib/ostmu ${_EXISTS}" "ok"
   fi
+else
+  print_message "${_THE_FOLDER} /var/lib/ostmu ${_EXISTS}" "ok"
 fi
 
-# check for the ports file
+# check if the port file exists and if not, create it
 if [ ! -f ${OSTMU_PORTS_FILE} ]; then
-  print_message "${_THE_PORTS_FILE_DOES_NOT_EXIST}" "notok"
-  print_message "${_CREATING_THE_FILE}."
-  touch ${OSTMU_PORTS_FILE}
+  touch "${OSTMU_PORTS_FILE}"
   if [ ! $? -eq 0 ]; then
-    print_message "${_THE_PORTS_FILE_IS_NOT_WRITABLE}" "error"
     exit 1;
+  else
+    print_message "${_THE_FILE} ${OSTMU_PORTS_FILE} ${_EXISTS}" "ok"
   fi
+else
+  print_message "${_THE_FILE} ${OSTMU_PORTS_FILE} ${_EXISTS}" "ok"
 fi
+
+# check if the ports file is writable
 if [ ! -w ${OSTMU_PORTS_FILE} ]; then
   print_message "${_THE_PORTS_FILE_IS_NOT_WRITABLE}" "error"
   exit 1;
 fi
 
 # check if the user config folder exists and if not, create it.
-if [ -d "${USER_CONFIG_FOLDER_PATH}" ];then
-  print_message "${_THE_FOLDER} ${USER_CONFIG_FOLDER_PATH} ${_EXISTS}." "ok"
-else
-  print_message "${_THE_FOLDER} ${USER_CONFIG_FOLDER_PATH} ${_DOES_NOT_EXIST}." "notok"
-  print_message "${_CREATING_THE_FOLDER}."
+if [ ! -d "${USER_CONFIG_FOLDER_PATH}" ];then
   mkdir -p "${USER_CONFIG_FOLDER_PATH}"
+  if [ ! $? -eq 0 ]; then
+    exit 1;
+  fi
   chown "${USER_NAME}":"${USER_NAME}" "${USER_CONFIG_FOLDER_PATH}"
+  if [ ! $? -eq 0 ]; then
+    exit 1;
+  fi
+else
+  print_message "${_THE_FOLDER} ${USER_CONFIG_FOLDER_PATH} ${_EXISTS}." "ok"
 fi
 
 if [ ${USE_MYSQL} == 1 ]; then
@@ -139,7 +147,13 @@ if [ ${USE_MYSQL} == 1 ]; then
     DB_PASSWORD=`cat ${USER_CONFIG_FOLDER_PATH}/db_pass`
   else
     echo ${DB_PASSWORD} > "${USER_CONFIG_FOLDER_PATH}/db_pass"
+    if [ ! $? -eq 0 ]; then
+      exit 1;
+    fi
     chown "${USER_NAME}":"${USER_NAME}" "${USER_CONFIG_FOLDER_PATH}/db_pass"
+    if [ ! $? -eq 0 ]; then
+      exit 1;
+    fi
   fi
 
   # load the mysql functions file
@@ -147,12 +161,11 @@ if [ ${USE_MYSQL} == 1 ]; then
 
   # check if the user exists in the database
   mysql_check_if_user_exists ${USER_NAME};
-  if [ $? -eq 1 ]; then
+  if [ $? -eq 0 ]; then
+    mysql_create_user ${USER_NAME} ${DB_PASSWORD}
     print_message "${_THE_USER} ${USER_NAME} ${_EXISTS} ${_IN_THE_DATABASE}." "ok"
   else
-    print_message "${_THE_USER} ${USER_NAME} ${_DOES_NOT_EXIST} ${_IN_THE_DATABASE}." "notok"
-    print_message "${_CREATING_THE_USER}"
-    mysql_create_user ${USER_NAME} ${DB_PASSWORD}
+    print_message "${_THE_USER} ${USER_NAME} ${_EXISTS} ${_IN_THE_DATABASE}." "ok"
   fi
 
   # create the database
@@ -161,10 +174,9 @@ fi
 
 # check if the simulator folder exists and if not, create it
 SIM_FOLDER="${USER_CONFIG_FOLDER_PATH}/${SIM_NAME}.sim"
-if [ -d "${SIM_FOLDER}" ];then
+if [ ! -d "${SIM_FOLDER}" ];then
+  create_sim_files "${SIM_FOLDER}"
   print_message "${_THE_FOLDER} ${SIM_FOLDER} ${_EXISTS}." "ok"
 else
-  print_message "${_THE_FOLDER} ${SIM_FOLDER} ${_DOES_NOT_EXIST}." "notok"
-  print_message "${_CREATING_THE_FOLDER}."
-  create_sim_files "${SIM_FOLDER}"
+  print_message "${_THE_FOLDER} ${SIM_FOLDER} ${_EXISTS}." "ok"
 fi

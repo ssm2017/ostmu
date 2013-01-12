@@ -44,6 +44,7 @@ _ASSIGNING_FOLDER_GROUP_TO="Assignation du dossier à"
 _THE_PERMISSIONS_OF="Les permissions de"
 
 # sims
+_THE_OPENSIM_BIN_FOLDER_EXISTS="Le dossier des binaires de opensim existe"
 _THE_OPENSIM_BIN_FOLDER_DOES_NOT_EXIST="Le dossier des binaires de opensim n'existe pas"
 _MAX_10_SIMS_PER_USER="Maximum 10 sims par utilisateur"
 _THE_SIMULATOR_CONSOLE="La console du simulateur"
