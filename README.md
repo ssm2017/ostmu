@@ -14,8 +14,6 @@ Installation
 
   - Rename the file ostmu/etc/config.example to ostmu/etc/config
 
-  - Rename the file ostmu/etc/ports.example to ostmu/etc/ports
-
   - Check the options in the file ostmu/etc/config
 
   - Check the ostmu/models files (the strings surrounded by <[ ]> will be replaced by variables)

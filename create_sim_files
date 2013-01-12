@@ -97,6 +97,32 @@ else
   exit 1;
 fi
 
+# check for the config folder
+if [ ! -d "/var/lib/ostmu" ]; then
+  print_message "${_THE_OSTMU_CONFIG_FOLDER_DOES_NOT_EXIST}" "notok"
+  print_message "${_CREATING_THE_FOLDER}."
+  mkdir -p "/var/lib/ostmu"
+  if [ ! $? -eq 0 ]; then
+    print_message "${_THE_FOLDER} /var/lib ${_IS_NOT_WRITABLE}" "error"
+    exit 1;
+  fi
+fi
+
+# check for the ports file
+if [ ! -f ${OSTMU_PORTS_FILE} ]; then
+  print_message "${_THE_PORTS_FILE_DOES_NOT_EXIST}" "notok"
+  print_message "${_CREATING_THE_FILE}."
+  touch ${OSTMU_PORTS_FILE}
+  if [ ! $? -eq 0 ]; then
+    print_message "${_THE_PORTS_FILE_IS_NOT_WRITABLE}" "error"
+    exit 1;
+  fi
+fi
+if [ ! -w ${OSTMU_PORTS_FILE} ]; then
+  print_message "${_THE_PORTS_FILE_IS_NOT_WRITABLE}" "error"
+  exit 1;
+fi
+
 # check if the user config folder exists and if not, create it.
 if [ -d "${USER_CONFIG_FOLDER_PATH}" ];then
   print_message "${_THE_FOLDER} ${USER_CONFIG_FOLDER_PATH} ${_EXISTS}." "ok"
