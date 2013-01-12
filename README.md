@@ -38,7 +38,7 @@ This script is not taking care about the mysql config so if the OpenSim.ini mode
 Run a simulator
 ---------------
 
-The users can run "opensim" file and follow the questions.
+The users can run "ostmu" file and follow the questions.
 
 Check a simulator
 -----------------

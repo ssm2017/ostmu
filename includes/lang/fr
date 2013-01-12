@@ -21,6 +21,7 @@ _WRONG_ANSWER="Mauvaise réponse"
 
 # users
 _THE_USER="L'utilisateur"
+_CREATING_THE_USER="Creation de l'utilisateur"
 
 # sys
 _FILE="fichier"
@@ -58,3 +59,6 @@ _YOUR_USER_SESSION="Votre session utilisateur"
 _CREATING_YOUR_USER_SESSION="Creation de votre session utilisateur"
 _CREATING_THE_WINDOW="Creation de la fenetre"
 _DO_YOU_WANT_TO_SEE_THE_SESSION="Voulez vous voir la session"
+
+# mysql
+_IN_THE_DATABASE="dans la base de données"
