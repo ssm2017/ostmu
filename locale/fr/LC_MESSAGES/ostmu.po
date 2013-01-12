@@ -195,11 +195,11 @@ msgstr "Creation de votre session utilisateur."
 
 #: ostmu:55
 msgid "The tmux window ${simname} exists."
-msgstr "La fenêtre tmux s'exécute."
+msgstr "La fenêtre tmux existe."
 
 #: ostmu:58
 msgid "The tmux window ${simname} does not exist."
-msgstr "La fenêtre tmux ne s'exécute pas."
+msgstr "La fenêtre tmux n'existe pas."
 
 #: ostmu:63
 msgid "${#WINDOW[@]} running simulators."

@@ -50,6 +50,7 @@ else
   fi
 fi
 
+# get the list of running tmux windows
 for simname in "${SIM_NAMES[@]}"; do
   if tmux_window_exists ${session_name} ${simname}; then
     echo -e ${SymbolOk} $"The tmux window ${simname} exists."
@@ -87,7 +88,11 @@ if [ ! "${#NO_WINDOW[@]}" -eq 0 ]; then
     if [[ "${NO_WINDOW[($answer - 1)]}" ]]; then
       simname="${NO_WINDOW[($answer - 1)]}"
       echo $"Creating the window : ${simname}"
-      tmux -S "${TMUX_SOCKET_FOLDER}/${session_name}" new-window -t "${session_name}" -n "${simname}"
+      if [ ${#WINDOW[@]} -eq 0 ]; then
+        tmux -S "${TMUX_SOCKET_FOLDER}/${session_name}" rename-window -t "${session_name}":0 "${simname}"
+      else
+        tmux -S "${TMUX_SOCKET_FOLDER}/${session_name}" new-window -t "${session_name}" -n "${simname}"
+      fi
       echo $"Starting the simulator"
       run_simulator "${USER}" "${simname}"
     else
