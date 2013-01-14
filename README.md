@@ -16,6 +16,8 @@ Installation
 
   - Rename the file ostmu/etc/config.example to ostmu/etc/config
 
+  - Rename the folder ostmu/models.example to ostmu/models
+
   - Check the options in the file ostmu/etc/config
 
   - Check the ostmu/models files (the strings surrounded by <[ ]> will be replaced by variables)

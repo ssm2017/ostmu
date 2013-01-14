@@ -55,7 +55,6 @@ if [ ! "${#has_no_session[@]}" -eq 0 ]; then
   fi
 fi
 
-
 # get the available sessions
 declare -a tmux_sessions=()
 cd "${TMUX_SOCKET_FOLDER}/${USER}"
