@@ -28,11 +28,14 @@ msgstr ""
 #: create_sim_files:21
 msgid "Usage : create_sim <user_name> <sim_name>"
 msgstr ""
+#: create_sim_files:57
+msgid "10 sims maximum per user."
+msgstr ""
 #: create_sim_files:100
-msgid "The user ${USER_NAME} exists."
+msgid "The user ${user_name} exists."
 msgstr ""
 #: create_sim_files:102
-msgid "The user ${USER_NAME} does not exist."
+msgid "The user ${user_name} does not exist."
 msgstr ""
 #: create_sim_files:112
 msgid "The folder /var/lib/ostmu was created."
@@ -50,37 +53,37 @@ msgstr ""
 msgid "The ports file is not writable"
 msgstr ""
 #: create_sim_files:142
-msgid "The folder ${USER_CONFIG_FOLDER_PATH} was created."
+msgid "The folder ${user_config_folder_path} was created."
 msgstr ""
 #: create_sim_files:148
-msgid "The ownership of the folder ${USER_CONFIG_FOLDER_PATH} was set to ${USER_NAME}"
+msgid "The ownership of the folder ${user_config_folder_path} was set to ${user_name}"
 msgstr ""
 #: create_sim_files:151
-msgid "The folder ${USER_CONFIG_FOLDER_PATH} exists."
+msgid "The folder ${user_config_folder_path} exists."
 msgstr ""
 #: create_sim_files:163
-msgid "The file ${USER_CONFIG_FOLDER_PATH}/db_pass was created."
+msgid "The file ${user_config_folder_path}/db_pass was created."
 msgstr ""
 #: create_sim_files:169
-msgid "The ownership of the file ${USER_CONFIG_FOLDER_PATH}/db_pass was set to ${USER_NAME}"
+msgid "The ownership of the file ${user_config_folder_path}/db_pass was set to ${user_name}"
 msgstr ""
 #: create_sim_files:180
-msgid "The user ${USER_NAME} was created in the database."
+msgid "The user ${user_name} was created in the database."
 msgstr ""
 #: create_sim_files:182
-msgid "The user ${USER_NAME} exists in the database."
+msgid "The user ${user_name} exists in the database."
 msgstr ""
 #: create_sim_files:193
-msgid "The folder ${SIM_FOLDER} was created."
+msgid "The folder ${sim_folder} was created."
 msgstr ""
 #: create_sim_files:195
-msgid "The folder ${SIM_FOLDER} exists."
+msgid "The folder ${sim_folder} exists."
 msgstr ""
 #: check_sim:12
 msgid "Usage : check_sim <user_name> <sim_name>"
 msgstr ""
 #: check_sim:34
-msgid "The folder ${SIM_FOLDER} does not exist."
+msgid "The folder ${sim_folder} does not exist."
 msgstr ""
 #: check_sim:43
 msgid "PID is running."
@@ -110,13 +113,13 @@ msgstr ""
 msgid "The simulator console is not answering."
 msgstr ""
 #: ostmu:14
-msgid "The folder ${USER_CONFIG_FOLDER_PATH} does not exist."
+msgid "The folder ${user_config_folder_path} does not exist."
 msgstr ""
 #: ostmu:25
-msgid "The file ${fullname} exists."
+msgid "The folder ${fullname} exists."
 msgstr ""
 #: ostmu:33
-msgid "There are no .sim folders inside ${USER_CONFIG_FOLDER_PATH}."
+msgid "There are no .sim folders inside ${user_config_folder_path}."
 msgstr ""
 #: ostmu:40
 msgid "Your user session : ${session_name} is running."
@@ -140,10 +143,10 @@ msgstr ""
 msgid "The tmux window ${simname} does not exist."
 msgstr ""
 #: ostmu:63
-msgid "${#WINDOW[@]} running simulators."
+msgid "${#has_window[@]} running simulators."
 msgstr ""
 #: ostmu:64
-msgid "${#NO_WINDOW[@]} non running simulators."
+msgid "${#has_no_has_window[@]} non running simulators."
 msgstr ""
 #: ostmu:67
 msgid "Do you want to start a new simulator ?"
@@ -168,4 +171,13 @@ msgid "Starting the simulator"
 msgstr ""
 #: ostmu:100
 msgid "Do you want to see the session ?"
+msgstr ""
+#: update_password:18
+msgid "Usage : update_password <user_name>"
+msgstr ""
+#: update_password:30
+msgid "The user password file exists."
+msgstr ""
+#: update_password:34
+msgid "The user password file does not exist."
 msgstr ""

@@ -53,13 +53,17 @@ msgstr "Les permissions sur le dossier ${TMUX_SOCKET_FOLDER} sont 2770."
 msgid "Usage : create_sim <user_name> <sim_name>"
 msgstr "Utilisation : create_sim <user_name> <sim_name>"
 
+#: create_sim_files:57
+msgid "10 sims maximum per user."
+msgstr "10 sims maximum par utilisateur."
+
 #: create_sim_files:100
-msgid "The user ${USER_NAME} exists."
-msgstr "L'utilisateur ${USER_NAME} existe."
+msgid "The user ${user_name} exists."
+msgstr "L'utilisateur ${user_name} existe."
 
 #: create_sim_files:102
-msgid "The user ${USER_NAME} does not exist."
-msgstr "L'utilisateur ${USER_NAME} n'existe pas."
+msgid "The user ${user_name} does not exist."
+msgstr "L'utilisateur ${user_name} n'existe pas."
 
 #: create_sim_files:112
 msgid "The folder /var/lib/ostmu was created."
@@ -82,48 +86,48 @@ msgid "The ports file is not writable"
 msgstr "Le fichier des ports n'est pas accessible en écriture."
 
 #: create_sim_files:142
-msgid "The folder ${USER_CONFIG_FOLDER_PATH} was created."
-msgstr "Le dossier ${USER_CONFIG_FOLDER_PATH} a été créé."
+msgid "The folder ${user_config_folder_path} was created."
+msgstr "Le dossier ${user_config_folder_path} a été créé."
 
 #: create_sim_files:148
-msgid "The ownership of the folder ${USER_CONFIG_FOLDER_PATH} was set to ${USER_NAME}"
-msgstr "La propriété du dossier ${USER_CONFIG_FOLDER_PATH} a été définie sur ${USER_NAME}"
+msgid "The ownership of the folder ${user_config_folder_path} was set to ${user_name}"
+msgstr "La propriété du dossier ${user_config_folder_path} a été définie sur ${user_name}"
 
 #: create_sim_files:151
-msgid "The folder ${USER_CONFIG_FOLDER_PATH} exists."
-msgstr "Le dossier  ${USER_CONFIG_FOLDER_PATH} existe."
+msgid "The folder ${user_config_folder_path} exists."
+msgstr "Le dossier ${user_config_folder_path} existe."
 
 #: create_sim_files:163
-msgid "The file ${USER_CONFIG_FOLDER_PATH}/db_pass was created."
-msgstr "Le fichier ${USER_CONFIG_FOLDER_PATH}/db_pass a été créé."
+msgid "The file ${user_config_folder_path}/db_pass was created."
+msgstr "Le fichier ${user_config_folder_path}/db_pass a été créé."
 
 #: create_sim_files:169
-msgid "The ownership of the file ${USER_CONFIG_FOLDER_PATH}/db_pass was set to ${USER_NAME}"
-msgstr "La propriété du fichier ${USER_CONFIG_FOLDER_PATH}/db_pass a été définie sur ${USER_NAME}"
+msgid "The ownership of the file ${user_config_folder_path}/db_pass was set to ${user_name}"
+msgstr "La propriété du fichier ${user_config_folder_path}/db_pass a été définie sur ${user_name}"
 
 #: create_sim_files:180
-msgid "The user ${USER_NAME} was created in the database."
-msgstr "L'utilisateur ${USER_NAME} a été créé dans la base de données."
+msgid "The user ${user_name} was created in the database."
+msgstr "L'utilisateur ${user_name} a été créé dans la base de données."
 
 #: create_sim_files:182
-msgid "The user ${USER_NAME} exists in the database."
-msgstr "L'utilisateur ${USER_NAME} existe dans la base de données."
+msgid "The user ${user_name} exists in the database."
+msgstr "L'utilisateur ${user_name} existe dans la base de données."
 
 #: create_sim_files:193
-msgid "The folder ${SIM_FOLDER} was created."
-msgstr "Le dossier ${SIM_FOLDER} a été créé."
+msgid "The folder ${sim_folder} was created."
+msgstr "Le dossier ${sim_folder} a été créé."
 
 #: create_sim_files:195
-msgid "The folder ${SIM_FOLDER} exists."
-msgstr "Le dossier ${SIM_FOLDER} existe."
+msgid "The folder ${sim_folder} exists."
+msgstr "Le dossier ${sim_folder} existe."
 
 #: check_sim:12
 msgid "Usage : check_sim <user_name> <sim_name>"
 msgstr "Utilisation : check_sim <user_name> <sim_name>"
 
 #: check_sim:34
-msgid "The folder ${SIM_FOLDER} does not exist."
-msgstr "Le dossier ${SIM_FOLDER} n'existe pas."
+msgid "The folder ${sim_folder} does not exist."
+msgstr "Le dossier ${sim_folder} n'existe pas."
 
 #: check_sim:43
 msgid "PID is running."
@@ -162,16 +166,16 @@ msgid "The simulator console is not answering."
 msgstr "La console du simulateur ne répond pas."
 
 #: ostmu:14
-msgid "The folder ${USER_CONFIG_FOLDER_PATH} does not exist."
-msgstr "Le dossier ${USER_CONFIG_FOLDER_PATH} existe."
+msgid "The folder ${user_config_folder_path} does not exist."
+msgstr "Le dossier ${user_config_folder_path} n'existe pas."
 
 #: ostmu:25
-msgid "The file ${fullname} exists."
-msgstr "Le dossier ${SIM_FOLDER} existe."
+msgid "The folder ${fullname} exists."
+msgstr "Le dossier ${fullname} existe."
 
 #: ostmu:33
-msgid "There are no .sim folders inside ${USER_CONFIG_FOLDER_PATH}."
-msgstr "Le dossier ${USER_CONFIG_FOLDER_PATH} existe."
+msgid "There are no .sim folders inside ${user_config_folder_path}."
+msgstr "Le dossier ${user_config_folder_path} existe."
 
 #: ostmu:40
 msgid "Your user session : ${session_name} is running."
@@ -195,19 +199,19 @@ msgstr "Creation de votre session utilisateur."
 
 #: ostmu:55
 msgid "The tmux window ${simname} exists."
-msgstr "La fenêtre tmux existe."
+msgstr "La fenêtre tmux ${simname} existe."
 
 #: ostmu:58
 msgid "The tmux window ${simname} does not exist."
-msgstr "La fenêtre tmux n'existe pas."
+msgstr "La fenêtre tmux ${simname} n'existe pas."
 
 #: ostmu:63
-msgid "${#WINDOW[@]} running simulators."
-msgstr "${#WINDOW[@]} simulateurs en marche."
+msgid "${#has_window[@]} running simulators."
+msgstr "${#has_window[@]} simulateurs en marche."
 
 #: ostmu:64
-msgid "${#NO_WINDOW[@]} non running simulators."
-msgstr "${#NO_WINDOW[@]} simulateurs arrétés."
+msgid "${#has_no_has_window[@]} non running simulators."
+msgstr "${#has_no_has_window[@]} simulateurs arrétés."
 
 #: ostmu:67
 msgid "Do you want to start a new simulator ?"
@@ -240,4 +244,16 @@ msgstr "Démarrage du simulateur"
 #: ostmu:100
 msgid "Do you want to see the session ?"
 msgstr "Voulez vous voir la session ?"
+
+#: update_password:18
+msgid "Usage : update_password <user_name>"
+msgstr "Utilisation : update_password <user_name>"
+
+#: update_password:30
+msgid "The user password file exists."
+msgstr "Le fichier de mot de passe de l'utilisateur existe."
+
+#: update_password:34
+msgid "The user password file does not exist."
+msgstr "Le fichier de mot de passe de l'utilisateur n'existe pas."
 

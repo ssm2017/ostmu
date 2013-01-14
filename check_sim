@@ -5,8 +5,8 @@ OSTMU_FOLDER="/opt/ostmu"
 source "${OSTMU_FOLDER}/etc/config"
 
 # define some vars
-USER_NAME=$1
-SIM_NAME=$2
+user_name=$1
+sim_name=$2
 
 show_help() {
   echo $"Usage : check_sim <user_name> <sim_name>"
@@ -20,23 +20,23 @@ if [ $# -lt 2 ];then
 fi
 
 # check if the user exists
-if user_exists ${USER_NAME} > /dev/null; then
-  echo -e ${SymbolOk} $"The user ${USER_NAME} exists."
+if user_exists ${user_name} > /dev/null; then
+  echo -e ${SymbolOk} $"The user ${user_name} exists."
 else
-  echo -e ${SymbolNotOk} $"The user ${USER_NAME} does not exist."
+  echo -e ${SymbolNotOk} $"The user ${user_name} does not exist."
   exit 1;
 fi
 
 # check if the simulator folder exists
-if simulator_folder_exists ${USER_NAME} ${SIM_NAME} > /dev/null;then
-  echo -e ${SymbolOk} $"The folder ${SIM_FOLDER} exists."
+if simulator_folder_exists ${user_name} ${sim_name} > /dev/null;then
+  echo -e ${SymbolOk} $"The folder ${sim_folder} exists."
 else
-  echo -e ${SymbolNotOk} $"The folder ${SIM_FOLDER} does not exist."
+  echo -e ${SymbolNotOk} $"The folder ${sim_folder} does not exist."
   exit 1;
 fi
 
 # check the simulator pid
-PID=$(get_sim_pid ${USER_NAME} ${SIM_NAME})
+PID=$(get_sim_pid ${user_name} ${sim_name})
 if [ $? = 0 ]; then
   print_message "${_THE_PID_FILE} ${_EXISTS}."
   if check_pid ${PID} > /dev/null;then
@@ -49,15 +49,21 @@ else
   exit 1;
 fi
 
+if [ ${TMUX_MULTIPLE_SESSIONS} -eq 1 ]; then
+  session_name="os-${user_name}-${sim_name}"
+else
+  session_name="os-${user_name}"
+fi
+
 # check if the tmux session is running
-if tmux_session_exists "os-${USER_NAME}"; then
+if tmux_session_exists "${user_name}" "${session_name}"; then
   echo -e ${SymbolOk} $"The tmux session is running."
 else
   echo -e ${SymbolNotOk} $"The tmux session is not running."
 fi
 
 # check if the tmux window is running
-if tmux_window_exists "os-${USER_NAME}" "${SIM_NAME}"; then
+if tmux_window_exists "${user_name}" "${session_name}" "${sim_name}"; then
   echo -e ${SymbolOk} $"The tmux window is running."
 else
   echo -e ${SymbolNotOk} $"The tmux window is not running."
@@ -65,7 +71,7 @@ else
 fi
 
 # check if the console is answering
-if simulator_console_is_answering "${USER_NAME}" "${SIM_NAME}"; then
+if simulator_console_is_answering "${user_name}" "${session_name}" "${sim_name}"; then
   echo -e ${SymbolOk} $"The simulator console is answering."
 else
   echo -e ${SymbolNotOk} $"The simulator console is not answering."

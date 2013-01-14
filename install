@@ -23,7 +23,7 @@ if [ ! -d "${TMUX_SOCKET_FOLDER}" ]; then
   if [ ! $? -eq 0 ]; then
     exit 1;
   else
-    echo -e ${SymbolOk} $"The folder ${TMUX_SOCKET_FOLDER} was created."
+    echo -e ${SymbolPlus} $"The folder ${TMUX_SOCKET_FOLDER} was created."
   fi
 else
   echo -e ${SymbolOk} $"The folder ${TMUX_SOCKET_FOLDER} exists."
@@ -35,7 +35,7 @@ if [ $(stat -c %G "${TMUX_SOCKET_FOLDER}") != "${TMUX_SOCKET_FOLDER_GROUP_NAME}"
   if [ ! $? -eq 0 ]; then
     exit 1;
   else
-    echo -e ${SymbolOk} $"Group ownership changed for folder ${TMUX_SOCKET_FOLDER}."
+    echo -e ${SymbolPlus} $"Group ownership changed for folder ${TMUX_SOCKET_FOLDER}."
   fi
 else
   echo -e ${SymbolOk} $"The folder ${TMUX_SOCKET_FOLDER} has good group ownership."
@@ -47,7 +47,7 @@ if [ ! $(stat -c %a "${TMUX_SOCKET_FOLDER}") = "2770" ]; then
   if [ ! $? -eq 0 ]; then
     exit 1;
   else
-    echo -e ${SymbolOk} $"The permissions were set to 2770 for the folder ${TMUX_SOCKET_FOLDER}."
+    echo -e ${SymbolPlus} $"The permissions were set to 2770 for the folder ${TMUX_SOCKET_FOLDER}."
   fi
 else
   echo -e ${SymbolOk} $"The permissions of the folder ${TMUX_SOCKET_FOLDER} are 2770."

@@ -1,9 +1,5 @@
 #! /bin/bash
 
-# lang
-TEXTDOMAIN=ostmu
-TEXTDOMAINDIR="${OSTMU_FOLDER}/locale"
-
 # opensimulator
 OPENSIMULATOR_FOLDER="/opt/opensim/bin"
 OPENSIMULATOR_BIN="${OPENSIMULATOR_FOLDER}/OpenSim.exe"
@@ -12,6 +8,7 @@ OPENSIMULATOR_GRID_IP=127.0.0.1
 # tmux
 TMUX_SOCKET_FOLDER="/tmp/tmux/sockets/opensimulator"
 TMUX_SOCKET_FOLDER_GROUP_NAME="tmux-share"
+TMUX_MULTIPLE_SESSIONS=1
 
 # ostmu
 OSTMU_INI_MODELS_FOLDER="${OSTMU_FOLDER}/models"
@@ -24,8 +21,14 @@ MYSQL_ROOT_USERNAME="root"
 MYSQL_ROOT_PASSWORD="root"
 
 # NOTHING SHOULD BE CHANGED UNDER THIS LINE
+
+# lang
+TEXTDOMAIN=ostmu
+TEXTDOMAINDIR="${OSTMU_FOLDER}/locale"
+
+# user
 USER_HOME=$(eval echo ~${SUDO_USER})
-USER_CONFIG_FOLDER_PATH="${USER_HOME}"/"${USER_CONFIG_FOLDER_NAME}"
+#user_config_folder_path="${USER_HOME}"/"${USER_CONFIG_FOLDER_NAME}"
 
 # include the colors declarations
 source "${OSTMU_FOLDER}/includes/theme"

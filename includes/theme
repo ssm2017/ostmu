@@ -31,5 +31,6 @@ ColInvertOff="${ColEscape}[27m";
 ColReset="${ColEscape}[0m";
 
 # symbols
-SymbolOk="${ColGreenF}${ColReset} "
-SymbolNotOk="${ColRedF}${ColReset} "
+SymbolOk="${ColGreenF}${ColReset}"
+SymbolNotOk="${ColRedF}${ColReset}"
+SymbolPlus="${ColGreenF}➕${ColReset}"

@@ -11,11 +11,12 @@ OSTMU_FOLDER="/opt/ostmu"
 source "${OSTMU_FOLDER}/etc/config"
 
 # define some vars
-USER_NAME=$1
-SIM_NAME=$2
-USER_PORT="0"
-SIM_PORT="0"
-DB_PASSWORD=`date | md5sum | cut -c1-8`
+user_name=$1
+sim_name=$2
+user_port="0"
+sim_port="0"
+user_config_folder_path="/home/${user_name}/${USER_CONFIG_FOLDER_NAME}"
+db_password=`date | md5sum | cut -c1-8`
 
 show_help() {
   echo $"Usage : create_sim <user_name> <sim_name>"
@@ -24,11 +25,11 @@ show_help() {
 
 add_file() {
   cat "${OSTMU_INI_MODELS_FOLDER}/$1" | \
-  sed -e 's/<\[user_name\]>/'${USER_NAME}'/g' \
+  sed -e 's/<\[user_name\]>/'${user_name}'/g' \
   -e 's/<\[grid_ip\]>/'${OPENSIMULATOR_GRID_IP}'/g' \
-  -e 's/<\[db_password\]>/'${DB_PASSWORD}'/g' \
-  -e 's/<\[sim_name\]>/'${SIM_NAME}'/g' \
-  -e 's/<\[sim_port\]>/'${SIM_PORT}'/g' > $2
+  -e 's/<\[db_password\]>/'${db_password}'/g' \
+  -e 's/<\[sim_name\]>/'${sim_name}'/g' \
+  -e 's/<\[sim_port\]>/'${sim_port}'/g' > $2
 }
 
 get_next_available_user_port() {
@@ -38,37 +39,37 @@ get_next_available_user_port() {
   users_qty=$(wc -l < "${OSTMU_PORTS_FILE}")
   next_user_nbr=$((${users_qty} + 1))
   if [ ${next_user_nbr} -lt 10 ];then
-    USER_PORT="10${next_user_nbr}00"
+    user_port="10${next_user_nbr}00"
   else
     if [ ${next_user_nbr} -gt 99 ];then
-      USER_PORT=$((${next_user_nbr} + 100))"00"
+      user_port=$((${next_user_nbr} + 100))"00"
     else
-      USER_PORT="1${next_user_nbr}00"
+      user_port="1${next_user_nbr}00"
     fi
   fi
-  echo "${USER_NAME};${USER_PORT}" >> "${OSTMU_PORTS_FILE}"
+  echo "${user_name};${user_port}" >> "${OSTMU_PORTS_FILE}"
 }
 
 create_sim_files() {
   # count user sim folders
-  sim_files_qty=$(find ${USER_CONFIG_FOLDER_PATH} -type d -name "*.sim" | wc -l)
+  sim_files_qty=$(find ${user_config_folder_path} -type d -name "*.sim" | wc -l)
   if [ ${sim_files_qty} -gt 9 ];then
-    print_message "${_MAX_10_SIMS_PER_USER}" "error"
+    echo -e ${SymbolNotOk} $"10 sims maximum per user."
     exit;
   fi
   # get the user port
-  user_port_line=$(grep "^${USER_NAME}" "${OSTMU_PORTS_FILE}")
+  user_port_line=$(grep "^${user_name}" "${OSTMU_PORTS_FILE}")
   if [ "${user_port_line}" ];then
     # get the user port
-    USER_PORT=$(echo "${user_port_line}" | cut -d ";" -f2)
+    user_port=$(echo "${user_port_line}" | cut -d ";" -f2)
   else
     get_next_available_user_port
   fi
   # define sim port
   if [ ${sim_files_qty} = 0 ];then
-    SIM_PORT=${USER_PORT}
+    sim_port=${user_port}
   else
-    SIM_PORT=$((${USER_PORT} + $((${sim_files_qty} * 10))))
+    sim_port=$((${user_port} + $((${sim_files_qty} * 10))))
   fi
   # add root files
   mkdir -p "$1"
@@ -86,7 +87,7 @@ create_sim_files() {
   mkdir -p "$1/regions"
   add_file "Regions.ini" "$1/regions/Regions.ini"
   # change ownership
-  chown -R "${USER_NAME}":"${USER_NAME}" "$1"
+  chown -R "${user_name}":"${user_name}" "$1"
 }
 
 # begin of logic
@@ -96,10 +97,10 @@ if [ $# -lt 2 ];then
 fi
 
 # check if the user exists
-if user_exists ${USER_NAME} > /dev/null; then
-  echo -e ${SymbolOk} $"The user ${USER_NAME} exists."
+if user_exists ${user_name} > /dev/null; then
+  echo -e ${SymbolOk} $"The user ${user_name} exists."
 else
-  echo -e ${SymbolNotOk} $"The user ${USER_NAME} does not exist."
+  echo -e ${SymbolNotOk} $"The user ${user_name} does not exist."
   exit 1;
 fi
 
@@ -109,7 +110,7 @@ if [ ! -d "/var/lib/ostmu" ]; then
   if [ ! $? -eq 0 ]; then
     exit 1;
   else
-    echo -e ${SymbolOk} $"The folder /var/lib/ostmu was created."
+    echo -e ${SymbolPlus} $"The folder /var/lib/ostmu was created."
   fi
 else
   echo -e ${SymbolOk} $"The folder /var/lib/ostmu exists."
@@ -121,7 +122,7 @@ if [ ! -f ${OSTMU_PORTS_FILE} ]; then
   if [ ! $? -eq 0 ]; then
     exit 1;
   else
-    echo -e ${SymbolOk} $"The file ${OSTMU_PORTS_FILE} was created."
+    echo -e ${SymbolPlus} $"The file ${OSTMU_PORTS_FILE} was created."
   fi
 else
   echo -e ${SymbolOk} $"The file ${OSTMU_PORTS_FILE} exists."
@@ -134,39 +135,39 @@ if [ ! -w ${OSTMU_PORTS_FILE} ]; then
 fi
 
 # check if the user config folder exists and if not, create it.
-if [ ! -d "${USER_CONFIG_FOLDER_PATH}" ];then
-  mkdir -p "${USER_CONFIG_FOLDER_PATH}"
+if [ ! -d "${user_config_folder_path}" ];then
+  mkdir -p "${user_config_folder_path}"
   if [ ! $? -eq 0 ]; then
     exit 1;
   else
-    echo -e ${SymbolOk} $"The folder ${USER_CONFIG_FOLDER_PATH} was created."
+    echo -e ${SymbolPlus} $"The folder ${user_config_folder_path} was created."
   fi
-  chown "${USER_NAME}":"${USER_NAME}" "${USER_CONFIG_FOLDER_PATH}"
+  chown "${user_name}":"${user_name}" "${user_config_folder_path}"
   if [ ! $? -eq 0 ]; then
     exit 1;
   else
-    echo -e ${SymbolOk} $"The ownership of the folder ${USER_CONFIG_FOLDER_PATH} was set to ${USER_NAME}":"${USER_NAME}."
+    echo -e ${SymbolPlus} $"The ownership of the folder ${user_config_folder_path} was set to ${user_name}":"${user_name}."
   fi
 else
-  echo -e ${SymbolOk} $"The folder ${USER_CONFIG_FOLDER_PATH} exists."
+  echo -e ${SymbolOk} $"The folder ${user_config_folder_path} exists."
 fi
 
 if [ ${USE_MYSQL} == 1 ]; then
   # check if the db password file exit and if not, create it
-  if [ -f "${USER_CONFIG_FOLDER_PATH}/db_pass" ];then
-    DB_PASSWORD=`cat ${USER_CONFIG_FOLDER_PATH}/db_pass`
+  if [ -f "${user_config_folder_path}/db_pass" ];then
+    db_password=`cat ${user_config_folder_path}/db_pass`
   else
-    echo ${DB_PASSWORD} > "${USER_CONFIG_FOLDER_PATH}/db_pass"
+    echo ${db_password} > "${user_config_folder_path}/db_pass"
     if [ ! $? -eq 0 ]; then
       exit 1;
     else
-      echo -e ${SymbolOk} $"The file ${USER_CONFIG_FOLDER_PATH}/db_pass was created."
+      echo -e ${SymbolPlus} $"The file ${user_config_folder_path}/db_pass was created."
     fi
-    chown "${USER_NAME}":"${USER_NAME}" "${USER_CONFIG_FOLDER_PATH}/db_pass"
+    chown "${user_name}":"${user_name}" "${user_config_folder_path}/db_pass"
     if [ ! $? -eq 0 ]; then
       exit 1;
     else
-      echo -e ${SymbolOk} $"The ownership of the file ${USER_CONFIG_FOLDER_PATH}/db_pass was set to ${USER_NAME}":"${USER_NAME}."
+      echo -e ${SymbolOk} $"The ownership of the file ${user_config_folder_path}/db_pass was set to ${user_name}":"${user_name}."
     fi
   fi
 
@@ -174,23 +175,36 @@ if [ ${USE_MYSQL} == 1 ]; then
   source "${OSTMU_FOLDER}/includes/mysql"
 
   # check if the user exists in the database
-  mysql_check_if_user_exists ${USER_NAME};
+  mysql_check_if_user_exists ${user_name};
   if [ $? -eq 0 ]; then
-    mysql_create_user ${USER_NAME} ${DB_PASSWORD}
-    echo -e ${SymbolOk} $"The user ${USER_NAME} was created in the database."
+    mysql_create_user ${user_name} ${db_password}
+    echo -e ${SymbolPlus} $"The user ${user_name} was created in the database."
   else
-    echo -e ${SymbolOk} $"The user ${USER_NAME} exists in the database."
+    echo -e ${SymbolOk} $"The user ${user_name} exists in the database."
   fi
 
   # create the database
-  mysql_create_database ${USER_NAME} "sim_${USER_NAME}_${SIM_NAME}"
+  mysql_create_database ${user_name} "sim_${user_name}_${sim_name}"
 fi
 
 # check if the simulator folder exists and if not, create it
-SIM_FOLDER="${USER_CONFIG_FOLDER_PATH}/${SIM_NAME}.sim"
-if [ ! -d "${SIM_FOLDER}" ];then
-  create_sim_files "${SIM_FOLDER}"
-  echo -e ${SymbolOk} $"The folder ${SIM_FOLDER} was created."
+sim_folder="${user_config_folder_path}/${sim_name}.sim"
+if [ ! -d "${sim_folder}" ];then
+  create_sim_files "${sim_folder}"
+  echo -e ${SymbolPlus} $"The folder ${sim_folder} was created."
 else
-  echo -e ${SymbolOk} $"The folder ${SIM_FOLDER} exists."
+  echo -e ${SymbolOk} $"The folder ${sim_folder} exists."
+fi
+
+# check if tmux user folder exists and if not, create it
+tmux_user_folder="${TMUX_SOCKET_FOLDER}/${user_name}"
+if [ ! -d "${tmux_user_folder}" ];then
+  mkdir -p "${tmux_user_folder}"
+  if [ ! $? -eq 0 ]; then
+    exit 1;
+  else
+    echo -e ${SymbolPlus} $"The tmux user folder was created."
+  fi
+else
+  echo -e ${SymbolOk} $"The tmux user folder exists."
 fi

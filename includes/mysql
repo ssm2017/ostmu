@@ -2,7 +2,7 @@
 
 MYSQL=`which mysql`
 
-# $1: username
+# $1: user name
 mysql_check_if_user_exists() {
   exists=`$MYSQL --batch --skip-column-names -u ${MYSQL_ROOT_USERNAME} -p${MYSQL_ROOT_PASSWORD} -e "SELECT EXISTS(SELECT 1 FROM mysql.user WHERE User = '$1');"`
   if [ $exists == "1" ]; then
@@ -12,14 +12,20 @@ mysql_check_if_user_exists() {
   fi
 }
 
-# $1: username
+# $1: user name
 # $2: password
 mysql_create_user() {
   echo "flush privileges;CREATE USER '$1'@'localhost' IDENTIFIED BY '$2';GRANT USAGE ON *.* TO '$1'@'localhost' IDENTIFIED BY '$2' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;" | $MYSQL --batch -u ${MYSQL_ROOT_USERNAME} -p${MYSQL_ROOT_PASSWORD}
 }
 
-# $1: username
+# $1: user name
 # $2: database
 mysql_create_database() {
   echo "CREATE DATABASE IF NOT EXISTS $2;GRANT ALL PRIVILEGES ON $2.* TO '$1'@'localhost';" | $MYSQL --batch --skip-column-names -u ${MYSQL_ROOT_USERNAME} -p${MYSQL_ROOT_PASSWORD}
+}
+
+# $1 user name
+# $2 password
+mysql_update_password() {
+  echo "SET PASSWORD FOR '${1}'@'localhost' = PASSWORD('${2}');" | $MYSQL --batch --skip-column-names -u ${MYSQL_ROOT_USERNAME} -p${MYSQL_ROOT_PASSWORD}
 }
