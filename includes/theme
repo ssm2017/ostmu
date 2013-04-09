@@ -33,4 +33,4 @@ ColReset="${ColEscape}[0m";
 # symbols
 SymbolOk="${ColGreenF}${ColReset}"
 SymbolNotOk="${ColRedF}${ColReset}"
-SymbolPlus="${ColGreenF}➕${ColReset}"
+SymbolPlus="${ColGreenF}✚${ColReset}"

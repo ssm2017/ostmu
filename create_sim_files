@@ -6,30 +6,56 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
+# check if params
+if [ $# -lt 2 ];then
+  echo $"Usage : create_sim <USER_NAME> <SIM_NAME>"
+  exit;
+fi
+
+# ======================
+#         config
+# ======================
+# check if the config file exists
+if [ ! -f "/etc/ostmu/ostmu.conf" ]; then
+  echo $"/etc/ostmu/ostmu.conf file not found."
+  exit 1;
+fi
+
 # include the config
-OSTMU_FOLDER="/opt/ostmu"
-source "${OSTMU_FOLDER}/etc/config"
+source "/etc/ostmu/ostmu.conf"
+
+# lang
+TEXTDOMAIN=ostmu
+TEXTDOMAINDIR="${OSTMU_FOLDER}/locale"
+
+# user
+USER_HOME=$(eval echo ~${SUDO_USER})
+#user_config_folder_path="${USER_HOME}"/"${USER_CONFIG_FOLDER_NAME}"
+
+# include the colors declarations
+source "${OSTMU_FOLDER}/includes/theme"
+
+# include functions files
+source "${OSTMU_FOLDER}/includes/sys"
+source "${OSTMU_FOLDER}/includes/users"
+source "${OSTMU_FOLDER}/includes/tmux"
+source "${OSTMU_FOLDER}/includes/sims"
 
 # define some vars
-user_name=$1
-sim_name=$2
+USER_NAME=$1
+SIM_NAME=$2
 user_port="0"
-sim_port="0"
-user_config_folder_path="/home/${user_name}/${USER_CONFIG_FOLDER_NAME}"
-db_password=`date | md5sum | cut -c1-8`
+SIM_PORT="0"
+user_config_folder_path="/home/${USER_NAME}/${USER_CONFIG_FOLDER_NAME}"
+SIM_FOLDER="${user_config_folder_path}/${SIM_NAME}.sim"
+DB_PASSWORD=`date | md5sum | cut -c1-8`
+OSTMU_PORTS_FILE="/var/lib/ostmu/ports"
 
-show_help() {
-  echo $"Usage : create_sim <user_name> <sim_name>"
-  exit;
-}
-
+# ======================
+#       functions
+# ======================
 add_file() {
-  cat "${OSTMU_INI_MODELS_FOLDER}/$1" | \
-  sed -e 's/<\[user_name\]>/'${user_name}'/g' \
-  -e 's/<\[grid_ip\]>/'${OPENSIMULATOR_GRID_IP}'/g' \
-  -e 's/<\[db_password\]>/'${db_password}'/g' \
-  -e 's/<\[sim_name\]>/'${sim_name}'/g' \
-  -e 's/<\[sim_port\]>/'${sim_port}'/g' > $2
+  eval "echo \"$(cat $1)\"" > $2
 }
 
 get_next_available_user_port() {
@@ -47,61 +73,25 @@ get_next_available_user_port() {
       user_port="1${next_user_nbr}00"
     fi
   fi
-  echo "${user_name};${user_port}" >> "${OSTMU_PORTS_FILE}"
+  echo "${USER_NAME};${user_port}" >> "${OSTMU_PORTS_FILE}"
 }
 
-create_sim_files() {
-  # count user sim folders
-  sim_files_qty=$(find ${user_config_folder_path} -type d -name "*.sim" | wc -l)
-  if [ ${sim_files_qty} -gt 9 ];then
-    echo -e ${SymbolNotOk} $"10 sims maximum per user."
-    exit;
-  fi
-  # get the user port
-  user_port_line=$(grep "^${user_name}" "${OSTMU_PORTS_FILE}")
-  if [ "${user_port_line}" ];then
-    # get the user port
-    user_port=$(echo "${user_port_line}" | cut -d ";" -f2)
-  else
-    get_next_available_user_port
-  fi
-  # define sim port
-  if [ ${sim_files_qty} = 0 ];then
-    sim_port=${user_port}
-  else
-    sim_port=$((${user_port} + $((${sim_files_qty} * 10))))
-  fi
-  # add root files
-  mkdir -p "$1"
-  add_file "OpenSim.exe.config" "$1/OpenSim.exe.config"
-  add_file "OpenSim.ini" "$1/OpenSim.ini"
-  # config-include
-  mkdir -p "$1/config-include"
-  add_file "GridCommon.ini" "$1/config-include/GridCommon.ini"
-  add_file "GridHypergrid.ini" "$1/config-include/GridHypergrid.ini"
-  # log
-  mkdir -p "$1/log"
-  # temp
-  mkdir -p "$1/temp"
-  # regions
-  mkdir -p "$1/regions"
-  add_file "Regions.ini" "$1/regions/Regions.ini"
-  # change ownership
-  chown -R "${user_name}":"${user_name}" "$1"
-}
-
-# begin of logic
-if [ $# -lt 2 ];then
-  show_help
-  exit;
+# ======================
+#         checks
+# ======================
+# check if the user exists
+if user_exists ${USER_NAME} > /dev/null; then
+  echo -e ${SymbolOk} $"The user ${USER_NAME} exists."
+else
+  echo -e ${SymbolNotOk} $"The user ${USER_NAME} does not exist."
+  exit 1;
 fi
 
-# check if the user exists
-if user_exists ${user_name} > /dev/null; then
-  echo -e ${SymbolOk} $"The user ${user_name} exists."
-else
-  echo -e ${SymbolNotOk} $"The user ${user_name} does not exist."
-  exit 1;
+# count user sim folders
+sim_files_qty=$(find ${user_config_folder_path} -type d -name "*.sim" | wc -l)
+if [ ${sim_files_qty} -gt 9 ];then
+  echo -e ${SymbolNotOk} $"10 sims maximum per user."
+  exit;
 fi
 
 # check for the config folder
@@ -130,8 +120,10 @@ fi
 
 # check if the ports file is writable
 if [ ! -w ${OSTMU_PORTS_FILE} ]; then
-  echo -e ${SymbolOk} $"The ports file is not writable"
+  echo -e ${SymbolNotOk} $"The ports file is not writable"
   exit 1;
+else
+  echo -e ${SymbolOk} $"The ports file is writable"
 fi
 
 # check if the user config folder exists and if not, create it.
@@ -142,62 +134,197 @@ if [ ! -d "${user_config_folder_path}" ];then
   else
     echo -e ${SymbolPlus} $"The folder ${user_config_folder_path} was created."
   fi
-  chown "${user_name}":"${user_name}" "${user_config_folder_path}"
+  chown "${USER_NAME}":"${USER_NAME}" "${user_config_folder_path}"
   if [ ! $? -eq 0 ]; then
     exit 1;
   else
-    echo -e ${SymbolPlus} $"The ownership of the folder ${user_config_folder_path} was set to ${user_name}":"${user_name}."
+    echo -e ${SymbolPlus} $"The ownership of the folder ${user_config_folder_path} was set to ${USER_NAME}":"${USER_NAME}."
   fi
 else
   echo -e ${SymbolOk} $"The folder ${user_config_folder_path} exists."
 fi
 
+# check if we will use mysql
+USE_MYSQL=0
+echo -e ${ColYellowF}$"Do you want to use mysql ?" ${ColReset}
+echo $"Enter y or n :"
+read use_mysql_answer
+if [ "$use_mysql_answer" == "y" ]; then
+  USE_MYSQL=1
+fi
+
+# ======================
+#         mysql
+# ======================
 if [ ${USE_MYSQL} == 1 ]; then
   # check if the db password file exit and if not, create it
   if [ -f "${user_config_folder_path}/db_pass" ];then
-    db_password=`cat ${user_config_folder_path}/db_pass`
+    DB_PASSWORD=`cat ${user_config_folder_path}/db_pass`
   else
-    echo ${db_password} > "${user_config_folder_path}/db_pass"
+    echo ${DB_PASSWORD} > "${user_config_folder_path}/db_pass"
     if [ ! $? -eq 0 ]; then
       exit 1;
     else
       echo -e ${SymbolPlus} $"The file ${user_config_folder_path}/db_pass was created."
     fi
-    chown "${user_name}":"${user_name}" "${user_config_folder_path}/db_pass"
+    chown "${USER_NAME}":"${USER_NAME}" "${user_config_folder_path}/db_pass"
     if [ ! $? -eq 0 ]; then
       exit 1;
     else
-      echo -e ${SymbolOk} $"The ownership of the file ${user_config_folder_path}/db_pass was set to ${user_name}":"${user_name}."
+      echo -e ${SymbolOk} $"The ownership of the file ${user_config_folder_path}/db_pass was set to ${USER_NAME}":"${USER_NAME}."
+    fi
+    chmod 600 "${user_config_folder_path}/db_pass"
+    if [ ! $? -eq 0 ]; then
+      exit 1;
+    else
+      echo -e ${SymbolOk} $"The permissions of the file ${user_config_folder_path}/db_pass were set to 600."
     fi
   fi
 
   # load the mysql functions file
   source "${OSTMU_FOLDER}/includes/mysql"
 
+  # check if the root user can access the database
+  if ! mysql -e ";" > /dev/null 2>&1; then
+    echo -e ${SymbolNotOk} $"The root user can not access the database."
+    exit 1;
+  fi
+
   # check if the user exists in the database
-  mysql_check_if_user_exists ${user_name};
+  mysql_check_if_user_exists ${USER_NAME};
   if [ $? -eq 0 ]; then
-    mysql_create_user ${user_name} ${db_password}
-    echo -e ${SymbolPlus} $"The user ${user_name} was created in the database."
+    mysql_create_user ${USER_NAME} ${DB_PASSWORD}
+    echo -e ${SymbolPlus} $"The user ${USER_NAME} was created in the database."
   else
-    echo -e ${SymbolOk} $"The user ${user_name} exists in the database."
+    echo -e ${SymbolOk} $"The user ${USER_NAME} exists in the database."
   fi
 
   # create the database
-  mysql_create_database ${user_name} "sim_${user_name}_${sim_name}"
+  mysql_create_database ${USER_NAME} "sim_${USER_NAME}_${SIM_NAME}"
+
+  # define the mysql OpenSim.ini string
+  DATABASE_STRING="StorageProvider = OpenSim.Data.MySQL.dll
+ConnectionString = \"Data Source=localhost;Database=sim_${USER_NAME}_${SIM_NAME};User ID=${USER_NAME};Password=${DB_PASSWORD};Old Guids=true;\""
+else
+  DATABASE_STRING="Include-Storage = \"${SIM_FOLDER}/config-include/storage/SQLiteStandalone.ini;\""
 fi
 
-# check if the simulator folder exists and if not, create it
-sim_folder="${user_config_folder_path}/${sim_name}.sim"
-if [ ! -d "${sim_folder}" ];then
-  create_sim_files "${sim_folder}"
-  echo -e ${SymbolPlus} $"The folder ${sim_folder} was created."
+# ======================
+#       grid type
+# ======================
+# get the grid type
+grid_type_name="default"
+declare -a grid_types=()
+cd "/etc/ostmu/models/grids"
+for i in *.grid;do
+  if [ -d $i ]; then
+    fullname=$(basename "$i")
+    #~ extension="${fullname##*.}"
+    shortname="${fullname%.*}"
+    grid_types=("${grid_types[@]}" "${shortname}")
+  fi
+done
+echo $"available grids :"
+i=0
+for grid_type in "${grid_types[@]}"; do
+  i=$((i+1))
+  echo "$i/ ${grid_type}"
+done
+
+# ask the user
+echo -e ${ColYellowF} $"What grid do you want to use ?" ${ColReset}
+echo $"Enter a number :"
+read grid_number
+if ! [[ "$grid_number" =~ ^[0-9]+$ ]] ; then
+  echo -e ${SymbolNotOk} $"Wrong answer. Good bye."
+  exit 1;
+fi
+if [ "$grid_number" -eq 0 ]; then
+  echo -e ${SymbolNotOk} $"Wrong answer. Good bye."
+  exit 1;
+fi
+if [[ "${grid_types[($grid_number - 1)]}" ]]; then
+  grid_type_name=${grid_types[($grid_number - 1)]}
 else
-  echo -e ${SymbolOk} $"The folder ${sim_folder} exists."
+  echo -e ${SymbolNotOk} $"Wrong answer. Good bye."
+  exit 1;
+fi
+
+# ask for the grid ip
+GRID_IP="localhost"
+if [ ${grid_type_name} != "standalone" ];then
+  echo -e ${ColYellowF} $"What is the grid hostname (or IP) ?" ${ColReset}
+  echo $"Enter a hostname or an IP. Default is localhost"
+  read grid_hostname_answer
+  if [ "${grid_hostname_answer}" != "" ];then
+    GRID_IP=${grid_hostname_answer}
+  fi
+fi
+
+# ======================
+#      write files
+# ======================
+# check if the simulator folder exists and if not, create it
+if [ ! -d "${SIM_FOLDER}" ];then
+
+  # get the user port
+  user_port_line=$(grep "^${USER_NAME}" "${OSTMU_PORTS_FILE}")
+  if [ "${user_port_line}" ];then
+    user_port=$(echo "${user_port_line}" | cut -d ";" -f2)
+  else
+    get_next_available_user_port
+  fi
+
+  # define sim port
+  if [ ${sim_files_qty} = 0 ];then
+    SIM_PORT=${user_port}
+  else
+    SIM_PORT=$((${user_port} + $((${sim_files_qty} * 10))))
+  fi
+
+  # config-include
+  mkdir -p "${SIM_FOLDER}/config-include"
+  add_file "/etc/ostmu/models/sims/config-include/FlotsamCache.ini" "${SIM_FOLDER}/config-include/FlotsamCache.ini"
+  if [ ${grid_type_name} == "standalone" ];then
+    ARCHITECTURE="${SIM_FOLDER}/config-include/StandaloneHypergrid.ini"
+    add_file "/etc/ostmu/models/grids/standalone.grid/StandaloneCommon.ini" "${SIM_FOLDER}/config-include/StandaloneCommon.ini"
+    add_file "/etc/ostmu/models/sims/config-include/StandaloneHypergrid.ini" "${SIM_FOLDER}/config-include/StandaloneHypergrid.ini"
+  else
+    ARCHITECTURE="${SIM_FOLDER}/config-include/GridHypergrid.ini"
+    add_file "/etc/ostmu/models/grids/${grid_type_name}.grid/GridCommon.ini" "${SIM_FOLDER}/config-include/GridCommon.ini"
+    add_file "/etc/ostmu/models/sims/config-include/GridHypergrid.ini" "${SIM_FOLDER}/config-include/GridHypergrid.ini"
+  fi
+
+  # add root files
+  mkdir -p "${SIM_FOLDER}"
+  add_file "/etc/ostmu/models/sims/OpenSim.exe.config" "${SIM_FOLDER}/OpenSim.exe.config"
+  add_file "/etc/ostmu/models/sims/OpenSim.ini" "${SIM_FOLDER}/OpenSim.ini"
+
+  # empty folders
+  mkdir -p "${SIM_FOLDER}/log"
+  mkdir -p "${SIM_FOLDER}/temp"
+  mkdir -p "${SIM_FOLDER}/Regions"
+  mkdir -p "${SIM_FOLDER}/maptiles"
+  mkdir -p "${SIM_FOLDER}/DataSnapshot"
+  mkdir -p "${SIM_FOLDER}/ScriptEngines"
+  mkdir -p "${SIM_FOLDER}/assetcache"
+
+  # sqlite
+  if [ ${USE_MYSQL} == 0 ]; then
+    mkdir -p "${SIM_FOLDER}/config-include/storage"
+    add_file "/etc/ostmu/models/sims/config-include/storage/SQLiteStandalone.ini" "${SIM_FOLDER}/config-include/storage/SQLiteStandalone.ini"
+  fi
+
+  # change ownership
+  chown -R "${USER_NAME}":"${USER_NAME}" "${SIM_FOLDER}"
+  echo -e ${SymbolPlus} $"The folder ${SIM_FOLDER} was created."
+
+else
+  echo -e ${SymbolOk} $"The folder ${SIM_FOLDER} exists."
 fi
 
 # check if tmux user folder exists and if not, create it
-tmux_user_folder="${TMUX_SOCKET_FOLDER}/${user_name}"
+tmux_user_folder="${TMUX_SOCKET_FOLDER}/${USER_NAME}"
 if [ ! -d "${tmux_user_folder}" ];then
   mkdir -p "${tmux_user_folder}"
   if [ ! $? -eq 0 ]; then
@@ -207,4 +334,16 @@ if [ ! -d "${tmux_user_folder}" ];then
   fi
 else
   echo -e ${SymbolOk} $"The tmux user folder exists."
+fi
+chown ${USER_NAME}:${TMUX_SOCKET_FOLDER_GROUP_NAME} "${tmux_user_folder}"
+if [ ! $? -eq 0 ]; then
+  exit 1;
+else
+  echo -e ${SymbolPlus} $"The tmux user folder ownership was set."
+fi
+chmod 2770 "${tmux_user_folder}"
+if [ ! $? -eq 0 ]; then
+  exit 1;
+else
+  echo -e ${SymbolPlus} $"The tmux user folder permissions were set."
 fi

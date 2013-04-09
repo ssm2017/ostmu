@@ -25,28 +25,26 @@ get_sim_pid() {
 
 # get opensimulator version
 # $1 User name
-# $2 session name
-# $3 Sim name
+# $2 Sim name
 simulator_console_is_answering() {
-  log_file_size_before=$(stat -c%s "/home/${1}/.opensimulator/${3}.sim/log/tmux.log")
-  tmux -S "${TMUX_SOCKET_FOLDER}/${1}/${2}" send-keys -t "${2}":"${3}" " show version" Enter
-  log_file_size_after=$(stat -c%s "/home/${1}/.opensimulator/${3}.sim/log/tmux.log")
+  log_file_size_before=$(stat -c%s "/home/${1}/.opensimulator/${2}.sim/log/tmux.log")
+  tmux -S "${TMUX_SOCKET_FOLDER}/${1}/socket" send-keys -t "${2}":"${2}" " show version" Enter
+  log_file_size_after=$(stat -c%s "/home/${1}/.opensimulator/${2}.sim/log/tmux.log")
   if [ ${log_file_size_before} = ${log_file_size_after} ]; then
     return 1;
   fi
-  tail -1 "/home/${1}/.opensimulator/${3}.sim/log/tmux.log" | grep "Region" > /dev/null
+  tail -1 "/home/${1}/.opensimulator/${2}.sim/log/tmux.log" | grep "Region" > /dev/null
   return $?;
 }
 
 # Run the simulator
 # $1 user name
-# $2 session name
-# $3 sim name
+# $2 sim name
 run_simulator() {
   # clear the log
-  cp /dev/null "${user_config_folder_path}/${3}.sim/log/tmux.log"
+  cp /dev/null "${user_config_folder_path}/${2}.sim/log/tmux.log"
   # start the log
-  tmux -S "${TMUX_SOCKET_FOLDER}/${1}/${2}" send-keys -t "${2}":"${3}" "tmux pipe-pane -o -t ${2}:${3} 'cat >> ${user_config_folder_path}/${3}.sim/log/tmux.log'" Enter
+  tmux -S "${TMUX_SOCKET_FOLDER}/${1}/socket" send-keys -t "${2}":"${2}" "tmux pipe-pane -o -t ${2}:${2} 'cat >> ${user_config_folder_path}/${2}.sim/log/tmux.log'" Enter
   # start the simulator
-  tmux -S "${TMUX_SOCKET_FOLDER}/${1}/${2}" send-keys -t "${2}":"${3}" "cd ${OPENSIMULATOR_FOLDER};MONO_ADDINS_REGISTRY=${user_config_folder_path}/${3}.sim/temp mono OpenSim.exe -logconfig=${user_config_folder_path}/${3}.sim/OpenSim.exe.config -inifile=${user_config_folder_path}/${3}.sim/OpenSim.ini" Enter
+  tmux -S "${TMUX_SOCKET_FOLDER}/${1}/socket" send-keys -t "${2}":"${2}" "cd ${OPENSIMULATOR_FOLDER};MONO_ADDINS_REGISTRY=${user_config_folder_path}/${2}.sim/temp mono OpenSim.exe -logconfig=${user_config_folder_path}/${2}.sim/OpenSim.exe.config -inifile=${user_config_folder_path}/${2}.sim/OpenSim.ini" Enter
 }

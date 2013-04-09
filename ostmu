@@ -1,25 +1,41 @@
 #! /bin/bash
 
+# ======================
+#         config
+# ======================
+# check if the config file exists
+if [ ! -f "/etc/ostmu/ostmu.conf" ]; then
+  echo $"/etc/ostmu/ostmu.conf file not found."
+  exit 1;
+fi
+
 # include the config
-OSTMU_FOLDER="/opt/ostmu"
-source "${OSTMU_FOLDER}/etc/config"
+source "/etc/ostmu/ostmu.conf"
+
+# lang
+TEXTDOMAIN=ostmu
+TEXTDOMAINDIR="${OSTMU_FOLDER}/locale"
+
+# user
+USER_HOME=$(eval echo ~${SUDO_USER})
+#user_config_folder_path="${USER_HOME}"/"${USER_CONFIG_FOLDER_NAME}"
+
+# include the colors declarations
+source "${OSTMU_FOLDER}/includes/theme"
+
+# include functions files
+source "${OSTMU_FOLDER}/includes/sys"
+source "${OSTMU_FOLDER}/includes/users"
+source "${OSTMU_FOLDER}/includes/tmux"
+source "${OSTMU_FOLDER}/includes/sims"
 
 # define some vars
 declare -a sim_names=()
 user_config_folder_path="/home/${USER}/${USER_CONFIG_FOLDER_NAME}"
 
-# check if tmux user folder exists and if not, create it
-tmux_user_folder="${TMUX_SOCKET_FOLDER}/${USER}"
-if [ ! -d "${tmux_user_folder}" ];then
-  mkdir -p "${tmux_user_folder}"
-  if [ ! $? -eq 0 ]; then
-    exit 1;
-  else
-    echo -e ${SymbolPlus} $"The tmux user folder was created."
-  fi
-else
-  echo -e ${SymbolOk} $"The tmux user folder exists."
-fi
+# ======================
+#         checks
+# ======================
 
 # check if the config folder exists
 if [ ! -d "$user_config_folder_path" ]; then
@@ -39,15 +55,130 @@ for i in *.sim;do
   fi
 done
 
-# check if there are ini files
+# count the .sim folders
 sim_folders_qty=${#sim_names[@]}
 if [ ${sim_folders_qty} -eq 0 ]; then
   echo -e ${SymbolNotOk} $"There are no .sim folders inside ${user_config_folder_path}."
   exit 1;
 fi
 
-if [ ${TMUX_MULTIPLE_SESSIONS} -eq 1 ]; then
-  source "${OSTMU_FOLDER}/includes/tmux-multiple"
+# check if display/start session
+if [ -d "${user_config_folder_path}/${1}.sim" ]; then
+  if ! tmux_session_exists ${USER} ${1}; then
+    tmux_create_session "${USER}" "${1}"
+    run_simulator "${USER}" "${1}"
+  fi
+  tmux -S "${TMUX_SOCKET_FOLDER}/${USER}/socket" attach -t "${1}"
+  exit 0;
+fi
+
+# check if autostart
+if [ "$1" == "autostart" ]; then
+  for simname in "${sim_names[@]}"; do
+    if [ -f "${user_config_folder_path}/${simname}.sim/autostart" ]; then
+      if ! tmux_session_exists ${USER} ${simname}; then
+        tmux_create_session "${USER}" "${simname}"
+        run_simulator "${USER}" "${simname}"
+      fi
+    fi
+  done
+  exit 0;
+fi
+
+# ======================
+#          ask
+# ======================
+declare -a has_session=()
+declare -a has_no_session=()
+
+# get the list of running tmux sessions
+for simname in "${sim_names[@]}"; do
+  if tmux_session_exists ${USER} ${simname}; then
+    echo -e ${SymbolOk} $"The tmux session ${simname} exists."
+    has_session=("${has_session[@]}" "${simname}");
+  else
+    echo -e ${SymbolNotOk} $"The tmux session ${simname} does not exist."
+    has_no_session=("${has_no_session[@]}" "${simname}");
+  fi
+done
+
+echo $"${#has_session[@]} running simulators."
+echo $"${#has_no_session[@]} non running simulators."
+
+if [ ! "${#has_no_session[@]}" -eq 0 ]; then
+  echo -e ${ColYellowF} $"Do you want to start a new simulator ?" ${ColReset}
+  echo $"Enter y or n :"
+  read start_sim
+  if [ "$start_sim" == "y" ]; then
+    echo $"available simulators :"
+    i=0
+    for simname in "${has_no_session[@]}"; do
+      i=$((i+1))
+      echo "$i/ ${simname}"
+    done
+    echo -e ${ColYellowF} $"What simulator do you want to start ?" ${ColReset}
+    echo $"Enter a number :"
+    read sim_number
+    if ! [[ "$sim_number" =~ ^[0-9]+$ ]] ; then
+      echo -e ${SymbolNotOk} $"Wrong answer. Good bye."
+      exit 1;
+    fi
+    if [ "$sim_number" -eq 0 ]; then
+      echo -e ${SymbolNotOk} $"Wrong answer. Good bye."
+      exit 0;
+    fi
+    if [[ "${has_no_session[($sim_number - 1)]}" ]]; then
+      simname="${has_no_session[($sim_number - 1)]}"
+      echo $"Creating the session : ${simname}"
+      tmux_create_session "${USER}" "${simname}"
+      echo $"Starting the simulator"
+      run_simulator "${USER}" "${simname}"
+    else
+      echo -e ${SymbolNotOk} $"Wrong answer. Good bye."
+      exit 1;
+    fi
+  fi
+fi
+
+# get the available sessions
+declare -a tmux_sessions=()
+cd "${TMUX_SOCKET_FOLDER}/${USER}"
+
+if [[ `tmux -S "${TMUX_SOCKET_FOLDER}/${USER}/socket" list-session  2>&1 | cut -d":" -f1` = "$i" ]]; then
+  tmux_sessions=("${tmux_sessions[@]}" "${i}")
+fi
+
+if [ "${#tmux_sessions[@]}" -eq 0 ]; then
+  exit;
+fi
+
+echo -e ${ColYellowF} $"Do you want to see a session ?" ${ColReset}
+echo $"Enter y or n :"
+read see_a_session
+if [ "$see_a_session" == "n" ]; then
+  exit 0;
+fi
+
+echo $"available sessions :"
+i=0
+for session_name in "${tmux_sessions[@]}"; do
+  i=$((i+1))
+  echo "$i/ ${session_name}"
+done
+echo -e ${ColYellowF} $"What session do you want to see ?" ${ColReset}
+echo $"Enter a number :"
+read session_number
+if ! [[ "$session_number" =~ ^[0-9]+$ ]] ; then
+  echo -e ${SymbolNotOk} $"Wrong answer. Good bye."
+  exit 1;
+fi
+if [ "$session_number" -eq 0 ]; then
+  echo -e ${SymbolNotOk} $"Wrong answer. Good bye."
+  exit 0;
+fi
+if [[ "${tmux_sessions[($session_number - 1)]}" ]]; then
+  tmux -S "${TMUX_SOCKET_FOLDER}/${USER}/socket" attach -t "${tmux_sessions[($session_number - 1)]}"
 else
-  source "${OSTMU_FOLDER}/includes/tmux-single"
+  echo -e ${SymbolNotOk} $"Wrong answer. Good bye."
+  exit 1;
 fi

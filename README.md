@@ -1,28 +1,31 @@
 This code is released under the GNU General Public License. See LICENSE.txt.
 
-Here is a set of bash scripts made under **Ubuntu** to use multiple **OpenSimulator** instances by multiple system users using **Tmux**.
+Here is a set of bash scripts made under **Debian** to use multiple **OpenSimulator** instances by multiple system users using **Tmux**.
 
 Note that these scripts are for testing only and not pretending to be fully functionnal.
-These scripts can Damage your system. Use them at your own risk.
+Use them at your own risk.
 
 Installation
 ------------
 
-  - Check the path to ostmu for the variable OSTMU_FOLDER at the top of the files if the files are not located in /opt/ostmu :
-    - install
-    - check_sim
-    - create_sim_files
-    - ostmu
-
-  - Rename the file ostmu/etc/config.example to ostmu/etc/config
-
-  - Rename the folder ostmu/models.example to ostmu/models
-
-  - Check the options in the file ostmu/etc/config
-
-  - Check the ostmu/models files (the strings surrounded by <[ ]> will be replaced by variables)
-   
   - run the file named "install" (as root)
+
+Then answer the questions.
+
+The installation process will create a /etc/ostmu folder. This folder contains the ostmu.conf file and some "models" folders. These models will be used when creating new simulators. You can customize the models using bash variables.
+
+The installation process will also create 2 symlinks in /usr/local/bin named :
+
+  - opensimulator
+
+  - check_sim
+
+Databases
+---------
+
+Actually, the script is set to use sqlite or mysql.
+
+To allow the script to write in the database, the root user needs to have credentials set in the /root/.my.cnf file.
 
 Create a new simulator
 ----------------------
@@ -33,14 +36,22 @@ Run the file named (as root)
 
 followed by the system user name and the sim name.
 
-ex :
+example :
 
-    sudo create_sim_files foo mysim
+    sudo create_sim_files JohnDoe mysim
+
+Then answer the questions.
 
 Run a simulator
 ---------------
 
-The users can run "ostmu" file and follow the questions.
+The users can run "opensimulator" file and follow the questions.
+
+  - If running "opensimulator" without any parameter, the script will ask you some questions.
+
+  - If running "opensimulator" followed by a sim name (without .sim at the end), the script will run the session and display it or just display it if it is already running.
+
+  - If running "opensimulator" followed by the keyword "autostart", the script will run all the user simulators that contain a file named "autostart" in the .sim folder of the simulator. (the file can be blank) (example : /home/JohnDoe/.opensimulator/mysim.sim/autostart)
 
 Check a simulator
 -----------------
@@ -53,33 +64,25 @@ followed by the system user name and the sim name.
 
 ex :
 
-    check_sim foo mysim
+    check_sim JohnDoe mysim
 
-Available variables for the models files
-----------------------------------------
-       <\[user_name\]>
-       <\[grid_ip\]>
-       <\[db_password\]>
-       <\[sim_name\]>
-       <\[sim_port\]>
+If everything is fine, the script will return 0 and 1 if there was an issue.
 
-Files organization
-------------------
+Update database password
+------------------------
 
-Here is the default files organization
+If you are running mysql and that you deleted the simulator folders, you can update the user password in the database using the file named :
 
-       /home/username/.opensimulator
-       └── sim1.sim
-           ├── config-include
-           │   ├── GridCommon.ini
-           │   └── GridHypergrid.ini
-           ├── log
-           │   └── sim1.log
-           │   └── OpenSim.log
-           ├── OpenSim.exe.config
-           ├── OpenSim.ini
-           └── regions
-               └── Regions.ini
+    update_password
+
+followed by the user name.
+
+The user database password is stored in a file in the user opensimulator folder and can be read only by the user or root.
+
+Example :
+
+    /home/JohnDoe/.opensimulator/db_pass
+
 
 Ports organization
 ------------------

@@ -2,15 +2,22 @@
 
 # Check if the tmux session exists
 # $1 user name
-# $2 session name
+# $2 sim name
 tmux_session_exists() {
-  tmux -S "${TMUX_SOCKET_FOLDER}/${1}/${2}" list-session 2>&1 | grep -q "^${2}"
+  tmux -S "${TMUX_SOCKET_FOLDER}/${1}/socket" list-session 2>&1 | grep -q "^${2}"
 }
 
 # Check if the tmux window exists
 # $1 user name
-# $2 session name
-# $3 Window name
+# $2 sim name
 tmux_window_exists() {
-  tmux -S "${TMUX_SOCKET_FOLDER}/${1}/${2}" list-window -t "${2}" 2>&1 | grep -q ": $3 \["
+  tmux -S "${TMUX_SOCKET_FOLDER}/${1}/socket" list-window -t "${2}" 2>&1 | grep -q ": $2 \["
+}
+
+# Create a new session
+# $1 user name
+# $2 sim name
+tmux_create_session() {
+  tmux -S "${TMUX_SOCKET_FOLDER}/${1}/socket" new-session -s "${2}" -d
+  tmux -S "${TMUX_SOCKET_FOLDER}/${1}/socket" rename-window -t "${2}":0 "${2}"
 }

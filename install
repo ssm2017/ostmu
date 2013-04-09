@@ -6,18 +6,105 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
-# include the config
-OSTMU_FOLDER="/opt/ostmu"
-source "${OSTMU_FOLDER}/etc/config"
+# install config file
+OSTMU_FOLDER=$(pwd)
 
-# check if the opensimulator bin files exist
-if [ ! -d "${OPENSIMULATOR_FOLDER}" ];then
-  echo -e ${SymbolNotOk} $"The opensimulator bin folder does not exist."
-  exit 1;
+# load the theme file
+source "${OSTMU_FOLDER}/includes/theme"
+
+echo "====================="
+echo " ostmu installation"
+echo "====================="
+# check if tmux is installed
+command -v tmux >/dev/null 2>&1 || { echo -e >&2 ${SymbolNotOk} $"Ostmu requires tmux but it's not installed. Aborting."; exit 1; }
+
+# ask where to install ostmu
+echo -e ${ColYellowF}$"Where do you want to install ostmu ?" ${ColReset}
+echo $"Actual folder is"" : ${OSTMU_FOLDER}"
+echo $"Press enter if you want to use this folder or enter a folder path."
+read install_folder_path
+if [ "$install_folder_path" != "" ]; then
+  if [ ! -d "${install_folder_path}" ];then
+    echo -e ${SymbolNotOk} $"This folder does not exist."
+    exit 1;
+  fi
+  echo -e ${SymbolOk} $"This folder exists."
+  mkdir -p "${install_folder_path}/ostmu"
+  OSTMU_FOLDER=${install_folder_path}/ostmu
 fi
-echo -e ${SymbolOk} $"The opensimulator bin folder exists."
 
-# check if the socket folder exist
+if [ ${OSTMU_FOLDER} != $(pwd) ];then
+  cp -aR ./ ${OSTMU_FOLDER}
+fi
+
+if [ -e "/usr/local/bin/opensimulator" ]; then
+  rm "/usr/local/bin/opensimulator"
+fi
+if [ -e "/usr/local/bin/check_sim" ]; then
+  rm "/usr/local/bin/check_sim"
+fi
+ln -s ${OSTMU_FOLDER}/ostmu /usr/local/bin/opensimulator
+ln -s ${OSTMU_FOLDER}/check_sim /usr/local/bin/check_sim
+
+# check if the OpenSimulator bin folder is at the default place
+OPENSIMULATOR_FOLDER="/opt/opensim/bin"
+if [ ! -d "${OPENSIMULATOR_FOLDER}" ]; then
+  OPENSIMULATOR_FOLDER=""
+fi
+
+# ask where is the OpenSimulator files folder
+echo -e ${ColYellowF}$"Where is the OpenSimulator bin folder ?" ${ColReset}
+if [ "${OPENSIMULATOR_FOLDER}" != "" ];then
+  echo $"An OpenSimulator bin folder was found in the default location (/opt/opensim/bin)"
+  echo $"Press enter if you want to use this folder or enter a folder path."
+else
+  echo $"Please enter a folder path."
+fi
+read opensim_folder_path
+if [ "$opensim_folder_path" != "" ]; then
+  OPENSIMULATOR_FOLDER=${opensim_folder_path}
+fi
+
+if [ ! -d "${OPENSIMULATOR_FOLDER}" ];then
+  echo -e ${SymbolNotOk} $"This folder does not exist."
+  exit 1;
+else
+  echo -e ${SymbolOk} $"This folder exists."
+fi
+
+# ask where to install tmux socket
+TMUX_SOCKET_FOLDER="/tmp/tmux/sockets/opensimulator"
+echo -e ${ColYellowF}$"Where do you want to install the tmux socket ?" ${ColReset}
+echo $"default folder is"" : ${TMUX_SOCKET_FOLDER}"
+echo $"Press enter if you want to use this folder or enter a folder path."
+read ostmu_socket_folder_path
+if [ "$ostmu_socket_folder_path" != "" ]; then
+  if [ ! -d "${ostmu_socket_folder_path}" ];then
+    echo -e ${SymbolNotOk} $"This folder does not exist."
+    exit 1;
+  fi
+  echo -e ${SymbolOk} $"This folder exists."
+  TMUX_SOCKET_FOLDER=${ostmu_socket_folder_path}
+fi
+
+# ask the group ownership for the tmux folder
+TMUX_SOCKET_FOLDER_GROUP_NAME="tmux-share"
+echo -e ${ColYellowF}$"What group name do you want to use for the tmux socket ?" ${ColReset}
+echo $"default group is"" : ${TMUX_SOCKET_FOLDER_GROUP_NAME}"
+echo $"Press enter if you want to use this group or enter a group name."
+read ostmu_socket_group_name
+if [ "$ostmu_socket_group_name" != "" ]; then
+  TMUX_SOCKET_FOLDER_GROUP_NAME=${ostmu_socket_group_name}
+fi
+
+if ! getent group $TMUX_SOCKET_FOLDER_GROUP_NAME > /dev/null 2>&1; then
+  echo -e ${SymbolNotOk} $"This group does not exist."
+  exit 1;
+else
+  echo -e ${SymbolOk} $"This group exists."
+fi
+
+# check if the socket folder exists
 if [ ! -d "${TMUX_SOCKET_FOLDER}" ]; then
   mkdir -p "${TMUX_SOCKET_FOLDER}"
   if [ ! $? -eq 0 ]; then
@@ -29,7 +116,7 @@ else
   echo -e ${SymbolOk} $"The folder ${TMUX_SOCKET_FOLDER} exists."
 fi
 
-# check ig the socket folder has the good group ownership
+# check if the socket folder has the good group ownership
 if [ $(stat -c %G "${TMUX_SOCKET_FOLDER}") != "${TMUX_SOCKET_FOLDER_GROUP_NAME}" ]; then
   chown root:"${TMUX_SOCKET_FOLDER_GROUP_NAME}" "${TMUX_SOCKET_FOLDER}"
   if [ ! $? -eq 0 ]; then
@@ -52,3 +139,35 @@ if [ ! $(stat -c %a "${TMUX_SOCKET_FOLDER}") = "2770" ]; then
 else
   echo -e ${SymbolOk} $"The permissions of the folder ${TMUX_SOCKET_FOLDER} are 2770."
 fi
+
+EXTERNAL_HOST_NAME="localhost"
+echo -e ${ColYellowF}$"Enter your external host name (or IP) ?" ${ColReset}
+read external_host_name_answer
+if [ "$external_host_name_answer" != "" ]; then
+  EXTERNAL_HOST_NAME=${external_host_name_answer}
+fi
+
+# check if the config folder exists
+if [ ! -d "/etc/ostmu" ]; then
+  mkdir -p "/etc/ostmu"
+  if [ ! $? -eq 0 ]; then
+    exit 1;
+  else
+    echo -e ${SymbolPlus} $"The folder /etc/ostmu was created."
+  fi
+else
+  echo -e ${SymbolOk} $"The folder /etc/ostmu exists."
+fi
+
+# write the config file
+echo "# ostmu config file
+OSTMU_FOLDER=\"${OSTMU_FOLDER}\"
+OPENSIMULATOR_FOLDER=\"${OPENSIMULATOR_FOLDER}\"
+TMUX_SOCKET_FOLDER=\"${TMUX_SOCKET_FOLDER}\"
+TMUX_SOCKET_FOLDER_GROUP_NAME=${TMUX_SOCKET_FOLDER_GROUP_NAME}
+USER_CONFIG_FOLDER_NAME=\".opensimulator\"
+EXTERNAL_HOST_NAME=${EXTERNAL_HOST_NAME}
+"  > /etc/ostmu/ostmu.conf
+
+# cp the models folder to the config folder
+cp -aR ./models.example /etc/ostmu/models
