@@ -170,4 +170,4 @@ EXTERNAL_HOST_NAME=${EXTERNAL_HOST_NAME}
 "  > /etc/ostmu/ostmu.conf
 
 # cp the models folder to the config folder
-cp -aR ./models.example /etc/ostmu/models
+cp -aR ./models /etc/ostmu/models
