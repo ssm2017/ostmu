@@ -308,6 +308,7 @@ if [ ! -d "${SIM_FOLDER}" ];then
   mkdir -p "${SIM_FOLDER}/DataSnapshot"
   mkdir -p "${SIM_FOLDER}/ScriptEngines"
   mkdir -p "${SIM_FOLDER}/assetcache"
+  mkdir -p "${SIM_FOLDER}/j2kDecodeCache"
 
   # sqlite
   if [ ${USE_MYSQL} == 0 ]; then

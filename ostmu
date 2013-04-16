@@ -16,10 +16,6 @@ source "/etc/ostmu/ostmu.conf"
 TEXTDOMAIN=ostmu
 TEXTDOMAINDIR="${OSTMU_FOLDER}/locale"
 
-# user
-USER_HOME=$(eval echo ~${SUDO_USER})
-#user_config_folder_path="${USER_HOME}"/"${USER_CONFIG_FOLDER_NAME}"
-
 # include the colors declarations
 source "${OSTMU_FOLDER}/includes/theme"
 
@@ -31,7 +27,25 @@ source "${OSTMU_FOLDER}/includes/sims"
 
 # define some vars
 declare -a sim_names=()
-user_config_folder_path="/home/${USER}/${USER_CONFIG_FOLDER_NAME}"
+act_user=${USER}
+
+# ======================
+#         route
+# ======================
+
+if [ $# -gt 1 ]; then
+  # check if actual user is in the tmux group
+  groups ${USER} | grep ${TMUX_SOCKET_FOLDER_GROUP_NAME} > /dev/null 2>&1
+  if [ $? -eq 1 ]; then
+    if [[ $EUID -ne 0 ]]; then
+      echo -e ${SymbolNotOk} $"You are not in the tmux group and you are not root."
+    fi
+  fi
+  act_user=${1}
+  shift
+fi
+#exit;
+user_config_folder_path="/home/${act_user}/${USER_CONFIG_FOLDER_NAME}"
 
 # ======================
 #         checks
@@ -62,13 +76,22 @@ if [ ${sim_folders_qty} -eq 0 ]; then
   exit 1;
 fi
 
+# check if the tmux folder exists
+if [ ! -d "${TMUX_SOCKET_FOLDER}/${act_user}/socket" ]; then
+  mkdir -p "${TMUX_SOCKET_FOLDER}/${act_user}/socket"
+  if [ ! $? ]; then
+    echo -e ${SymbolNotOk} $"Could not create the tmux socket folder."
+    exit;
+  fi
+fi
+
 # check if display/start session
 if [ -d "${user_config_folder_path}/${1}.sim" ]; then
-  if ! tmux_session_exists ${USER} ${1}; then
-    tmux_create_session "${USER}" "${1}"
-    run_simulator "${USER}" "${1}"
+  if ! tmux_session_exists ${act_user} ${1}; then
+    tmux_create_session "${act_user}" "${1}"
+    run_simulator "${act_user}" "${1}"
   fi
-  tmux -S "${TMUX_SOCKET_FOLDER}/${USER}/socket" attach -t "${1}"
+  tmux -S "${TMUX_SOCKET_FOLDER}/${act_user}/socket" attach -t "${1}"
   exit 0;
 fi
 
@@ -76,9 +99,9 @@ fi
 if [ "$1" == "autostart" ]; then
   for simname in "${sim_names[@]}"; do
     if [ -f "${user_config_folder_path}/${simname}.sim/autostart" ]; then
-      if ! tmux_session_exists ${USER} ${simname}; then
-        tmux_create_session "${USER}" "${simname}"
-        run_simulator "${USER}" "${simname}"
+      if ! tmux_session_exists ${act_user} ${simname}; then
+        tmux_create_session "${act_user}" "${simname}"
+        run_simulator "${act_user}" "${simname}"
       fi
     fi
   done
@@ -93,7 +116,7 @@ declare -a has_no_session=()
 
 # get the list of running tmux sessions
 for simname in "${sim_names[@]}"; do
-  if tmux_session_exists ${USER} ${simname}; then
+  if tmux_session_exists ${act_user} ${simname}; then
     echo -e ${SymbolOk} $"The tmux session ${simname} exists."
     has_session=("${has_session[@]}" "${simname}");
   else
@@ -130,9 +153,9 @@ if [ ! "${#has_no_session[@]}" -eq 0 ]; then
     if [[ "${has_no_session[($sim_number - 1)]}" ]]; then
       simname="${has_no_session[($sim_number - 1)]}"
       echo $"Creating the session : ${simname}"
-      tmux_create_session "${USER}" "${simname}"
+      tmux_create_session "${act_user}" "${simname}"
       echo $"Starting the simulator"
-      run_simulator "${USER}" "${simname}"
+      run_simulator "${act_user}" "${simname}"
     else
       echo -e ${SymbolNotOk} $"Wrong answer. Good bye."
       exit 1;
@@ -142,9 +165,9 @@ fi
 
 # get the available sessions
 declare -a tmux_sessions=()
-cd "${TMUX_SOCKET_FOLDER}/${USER}"
+cd "${TMUX_SOCKET_FOLDER}/${act_user}"
 
-if [[ `tmux -S "${TMUX_SOCKET_FOLDER}/${USER}/socket" list-session  2>&1 | cut -d":" -f1` = "$i" ]]; then
+if [[ `tmux -S "${TMUX_SOCKET_FOLDER}/${act_user}/socket" list-session  2>&1 | cut -d":" -f1` = "$i" ]]; then
   tmux_sessions=("${tmux_sessions[@]}" "${i}")
 fi
 
@@ -177,7 +200,7 @@ if [ "$session_number" -eq 0 ]; then
   exit 0;
 fi
 if [[ "${tmux_sessions[($session_number - 1)]}" ]]; then
-  tmux -S "${TMUX_SOCKET_FOLDER}/${USER}/socket" attach -t "${tmux_sessions[($session_number - 1)]}"
+  tmux -S "${TMUX_SOCKET_FOLDER}/${act_user}/socket" attach -t "${tmux_sessions[($session_number - 1)]}"
 else
   echo -e ${SymbolNotOk} $"Wrong answer. Good bye."
   exit 1;
