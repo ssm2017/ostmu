@@ -77,8 +77,8 @@ if [ ${sim_folders_qty} -eq 0 ]; then
 fi
 
 # check if the tmux folder exists
-if [ ! -d "${TMUX_SOCKET_FOLDER}/${act_user}/socket" ]; then
-  mkdir -p "${TMUX_SOCKET_FOLDER}/${act_user}/socket"
+if [ ! -d "${TMUX_SOCKET_FOLDER}/${act_user}" ]; then
+  mkdir -p "${TMUX_SOCKET_FOLDER}/${act_user}"
   if [ ! $? ]; then
     echo -e ${SymbolNotOk} $"Could not create the tmux socket folder."
     exit;
