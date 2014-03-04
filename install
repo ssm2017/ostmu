@@ -216,3 +216,9 @@ EXTERNAL_HOST_NAME=${EXTERNAL_HOST_NAME}
 # cp the models folder to the config folder
 cp -aR ./models /etc/ostmu/models
 chown -R root:root /etc/ostmu
+
+#======
+# End
+#======
+echo -e ${SymbolOk} $"Installation Finished"
+echo -e ${SeparatorLine}
