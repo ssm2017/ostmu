@@ -145,6 +145,7 @@ else
 fi
 
 # check if we will use mysql
+echo -e ${SeparatorLine}
 USE_MYSQL=0
 echo -e ${ColYellowF}$"Do you want to use mysql ?" ${ColReset}
 echo $"Enter y or n :"
@@ -212,6 +213,7 @@ fi
 # ======================
 #       grid type
 # ======================
+echo -e ${SeparatorLine}
 # get the grid type
 grid_type_name="default"
 declare -a grid_types=()
@@ -251,6 +253,7 @@ else
 fi
 
 # ask for the grid ip
+echo -e ${SeparatorLine}
 GRID_IP="localhost"
 if [ ${grid_type_name} != "standalone" ];then
   echo -e ${ColYellowF} $"What is the grid hostname (or IP) ?" ${ColReset}
@@ -316,6 +319,9 @@ if [ ! -d "${SIM_FOLDER}" ];then
     add_file "/etc/ostmu/models/sims/config-include/storage/SQLiteStandalone.ini" "${SIM_FOLDER}/config-include/storage/SQLiteStandalone.ini"
   fi
 
+  # ostmu config file
+  echo "SIM_PORT=${SIM_PORT}" > "${SIM_FOLDER}/.ostmu"
+
   # change ownership
   chown -R "${USER_NAME}":"${USER_NAME}" "${SIM_FOLDER}"
   echo -e ${SymbolPlus} $"The folder ${SIM_FOLDER} was created."
@@ -348,3 +354,10 @@ if [ ! $? -eq 0 ]; then
 else
   echo -e ${SymbolPlus} $"The tmux user folder permissions were set."
 fi
+
+#======
+# End
+#======
+echo -e ${SeparatorLine}
+echo -e ${SymbolOk} $"Sim files created"
+echo -e ${SeparatorLine}

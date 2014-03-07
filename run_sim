@@ -1,0 +1,112 @@
+#!/bin/bash
+
+show_help() {
+  cat <<EOF
+usage: run_sim <start|stop|restart|console> <user_name> <sim name>
+EOF
+  exit 1
+}
+
+# check if params
+if [ $# -lt 3 ];then
+  show_help
+  exit;
+fi
+
+# check if good user
+if [ ! "$(id -nu)" = "${2}" ]; then
+  #su - opensim -c "$0 $*"
+  sudo -i -u ${2} -- /usr/local/bin/run_sim $*
+  exit
+fi
+
+# ======================
+#         config
+# ======================
+# check if the config file exists
+if [ ! -f "/etc/ostmu/ostmu.conf" ]; then
+  echo $"/etc/ostmu/ostmu.conf file not found."
+  exit 1;
+fi
+
+command=$1
+user_name=$2
+sim_name=$3
+
+# include the config
+source "/etc/ostmu/ostmu.conf"
+
+# lang
+TEXTDOMAIN=ostmu
+TEXTDOMAINDIR="${OSTMU_FOLDER}/locale"
+
+# user
+user_config_folder_path="/home/${user_name}/${USER_CONFIG_FOLDER_NAME}"
+
+# include the colors declarations
+source "${OSTMU_FOLDER}/includes/theme"
+
+# include functions files
+source "${OSTMU_FOLDER}/includes/sys"
+source "${OSTMU_FOLDER}/includes/users"
+source "${OSTMU_FOLDER}/includes/tmux"
+source "${OSTMU_FOLDER}/includes/sims"
+
+service_is_running() {
+  check_sim ${user_name} ${sim_name}
+  return $?;
+}
+
+do_start() {
+  service_is_running
+  if [ $? -eq 0 ]; then
+    echo "The simulator ${sim_name} seems to be already running."
+    exit 1
+  else
+    echo -n "Starting... "
+    tmux_session_exists ${user_name} ${sim_name}
+    if [ ! $? -eq 0 ]; then
+      tmux_create_session "${user_name}" "${sim_name}"
+      run_simulator "${user_name}" "${sim_name}"
+      exit 0;
+    fi
+    check_sim ${user_name} ${sim_name}
+    # check if simulator is responding
+    if [ ! $? -eq 0 ]; then
+      run_simulator "${user_name}" "${sim_name}"
+    fi
+    exit 0;
+  fi
+}
+
+do_stop() {
+  service_is_running
+  if [ ! $? -eq 0 ]; then
+    stop_simulator ${user_name} ${sim_name}
+  else
+    echo "The simulator ${sim_name} doesn't exist."
+    exit 1
+  fi
+}
+
+case "$1" in
+  start)
+    do_start $3
+    ;;
+  stop)
+    do_stop $3
+    ;;
+  restart)
+    do_stop $3
+    sleep 5
+    do_start $3
+    ;;
+  console)
+    ostmu ${sim_name}
+    ;;
+  *)
+    show_help
+    ;;
+esac
+
+exit 0

@@ -37,6 +37,7 @@ source "${OSTMU_FOLDER}/includes/sims"
 # define some vars
 user_name=$1
 sim_name=$2
+success=0
 
 # ======================
 #         checks
@@ -57,6 +58,14 @@ else
   echo -e ${SymbolNotOk} $"The folder ${sim_folder} does not exist."
   exit 1;
 fi
+
+# load the simulator .ostmu config file
+config_file="/home/${user_name}/.opensimulator/${sim_name}.sim/.ostmu"
+if [ ! -f ${config_file} ]; then
+  echo -e ${SymbolNotOk} $"The file ${config_file} does not exist."
+  exit 1;
+fi
+source ${config_file}
 
 # check the simulator pid
 PID=$(get_sim_pid ${user_name} ${sim_name})
@@ -90,10 +99,33 @@ else
 fi
 
 # check if the console is answering
-if simulator_console_is_answering "${user_name}" "${sim_name}"; then
-  echo -e ${SymbolOk} $"The simulator console is answering."
+#if simulator_console_is_answering "${user_name}" "${sim_name}"; then
+#  echo -e ${SymbolOk} $"The simulator console is answering."
+#else
+#  echo -e ${SymbolNotOk} $"The simulator console is not answering."
+#  exit 1;
+#fi
+
+# get the user db password
+# @todo : see sqlite
+db_pass_file="/home/${1}/.opensimulator/db_pass"
+if [ -f ${db_pass_file} ]; then
+  db_password=`cat ${db_pass_file}`
 else
-  echo -e ${SymbolNotOk} $"The simulator console is not answering."
+  echo -e ${SymbolNotOk} $"The file ${db_pass_file} does not exist."
   exit 1;
 fi
-exit 0;
+
+# check if the regions are responding
+regions=$(get_simulator_regions ${user_name} ${db_password} ${sim_name})
+for region in $regions; do
+  region_stats_is_answering "http://${EXTERNAL_HOST_NAME}" ${SIM_PORT} $region
+  if [ $? = 0 ]; then
+    echo -e ${SymbolOk} $"The region ${region} is answering."
+  else
+    echo -e ${SymbolNotOk} $"The region ${region} is not answering."
+    exit 1;
+  fi
+done
+
+

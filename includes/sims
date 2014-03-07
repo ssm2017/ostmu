@@ -23,18 +23,54 @@ get_sim_pid() {
   fi
 }
 
+# Get simulator regions
+# $1 User name
+# $2 Password
+# $3 Simulator name
+get_simulator_regions() {
+  MYSQL=`which mysql`
+  regions=`$MYSQL -u ${1} -p${2} --batch --skip-column-names -e "SELECT regionUUID FROM sim_${1}_${3}.regionsettings;"`
+  echo $regions;
+}
+
 # get opensimulator version
 # $1 User name
 # $2 Sim name
 simulator_console_is_answering() {
   log_file_size_before=$(stat -c%s "/home/${1}/.opensimulator/${2}.sim/log/tmux.log")
-  tmux -S "${TMUX_SOCKET_FOLDER}/${1}/socket" send-keys -t "${2}":"${2}" " show version" Enter
+  tmux -S "${TMUX_SOCKET_FOLDER}/${1}/socket" send-keys -t "${2}:${2}" " show version" Enter
   log_file_size_after=$(stat -c%s "/home/${1}/.opensimulator/${2}.sim/log/tmux.log")
   if [ ${log_file_size_before} = ${log_file_size_after} ]; then
+  echo "identique"
     return 1;
   fi
   tail -1 "/home/${1}/.opensimulator/${2}.sim/log/tmux.log" | grep "Region" > /dev/null
   return $?;
+}
+
+# Check if the region stats are answering
+# $1 Url of the simulator (http://localhost)
+# $2 Port of the simulator
+# $3 Uuid of the region
+region_stats_is_answering() {
+  URI="$1:$2/monitorstats/$3"
+
+  # check if answer was 200
+  response=$(curl --write-out %{http_code} --silent --output /dev/null ${URI})
+  if [ ! $response -eq 200 ]; then
+	  return 1;
+  fi
+
+  # check if the region is responding
+  xml=$(curl ${URI} 2>/dev/null)
+
+  # parse xml
+  value=$(grep -oPm1 "(?<=<TotalFrameMonitor>)[^<]+" <<< "$xml")
+  if [ $value -gt 0 ]; then
+	  return 0;
+  fi
+
+  return 1;
 }
 
 # Run the simulator
@@ -46,5 +82,15 @@ run_simulator() {
   # start the log
   tmux -S "${TMUX_SOCKET_FOLDER}/${1}/socket" send-keys -t "${2}":"${2}" "tmux pipe-pane -o -t ${2}:${2} 'cat >> ${user_config_folder_path}/${2}.sim/log/tmux.log'" Enter
   # start the simulator
-  tmux -S "${TMUX_SOCKET_FOLDER}/${1}/socket" send-keys -t "${2}":"${2}" "cd ${OPENSIMULATOR_FOLDER};MONO_ADDINS_REGISTRY=${user_config_folder_path}/${2}.sim/temp mono OpenSim.exe -logconfig=${user_config_folder_path}/${2}.sim/OpenSim.exe.config -inifile=${user_config_folder_path}/${2}.sim/OpenSim.ini" Enter
+  tmux -S "${TMUX_SOCKET_FOLDER}/${1}/socket" send-keys -t "${2}":"${2}" "cd ${OPENSIMULATOR_FOLDER};MONO_ADDINS_REGISTRY=${user_config_folder_path}/${2}.sim/temp mono --server OpenSim.exe -logconfig=${user_config_folder_path}/${2}.sim/OpenSim.exe.config -inifile=${user_config_folder_path}/${2}.sim/OpenSim.ini" Enter
+}
+
+# Stop the simulator
+# $1 user name
+# $2 sim name
+stop_simulator() {
+  tmux -S "${TMUX_SOCKET_FOLDER}/${1}/socket" send-keys -t "${2}":"${2}" "" c-m
+  tmux -S "${TMUX_SOCKET_FOLDER}/${1}/socket" send-keys -t "${2}":"${2}" "quit" c-m
+  sleep 5
+  tmux -S "${TMUX_SOCKET_FOLDER}/${1}/socket" kill-session -t "${2}"
 }

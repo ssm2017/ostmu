@@ -1,0 +1,44 @@
+#! /bin/bash
+
+if [ $# -lt 3 ];then
+  echo $"Usage : check_region <URL> <PORT> <UUID>"
+  exit;
+fi
+
+# ======================
+#         config
+# ======================
+# check if the config file exists
+if [ ! -f "/etc/ostmu/ostmu.conf" ]; then
+  echo $"/etc/ostmu/ostmu.conf file not found."
+  exit 1;
+fi
+
+# include the config
+source "/etc/ostmu/ostmu.conf"
+
+# lang
+TEXTDOMAIN=ostmu
+TEXTDOMAINDIR="${OSTMU_FOLDER}/locale"
+
+# user
+USER_HOME=$(eval echo ~${SUDO_USER})
+#user_config_folder_path="${USER_HOME}"/"${USER_CONFIG_FOLDER_NAME}"
+
+# include the colors declarations
+source "${OSTMU_FOLDER}/includes/theme"
+
+# include functions files
+source "${OSTMU_FOLDER}/includes/sys"
+source "${OSTMU_FOLDER}/includes/users"
+source "${OSTMU_FOLDER}/includes/tmux"
+source "${OSTMU_FOLDER}/includes/sims"
+
+# check if the region is answering
+if region_stats_is_answering "$1" "$2" "$3"; then
+  echo -e ${SymbolOk} $"The region is answering."
+else
+  echo -e ${SymbolNotOk} $"The region is not answering."
+  exit 1;
+fi
+exit 0;

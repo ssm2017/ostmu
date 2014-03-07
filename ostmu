@@ -91,6 +91,10 @@ if [ -d "${user_config_folder_path}/${1}.sim" ]; then
     tmux_create_session "${act_user}" "${1}"
     run_simulator "${act_user}" "${1}"
   fi
+  # check if simulator is responding
+  if ! check_sim ${act_user} ${1}; then
+    run_simulator "${act_user}" "${1}"
+  fi
   tmux -S "${TMUX_SOCKET_FOLDER}/${act_user}/socket" attach -t "${1}"
   exit 0;
 fi
