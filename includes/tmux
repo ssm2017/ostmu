@@ -20,4 +20,12 @@ tmux_window_exists() {
 tmux_create_session() {
   tmux -S "${TMUX_SOCKET_FOLDER}/${1}/socket" new-session -s "${2}" -d
   tmux -S "${TMUX_SOCKET_FOLDER}/${1}/socket" rename-window -t "${2}":0 "${2}"
+  chown ${1} "${TMUX_SOCKET_FOLDER}/${1}/socket"
+}
+
+# Attach a session
+# $1 user name
+# $2 sim name
+tmux_attach_session() {
+  tmux -S "${TMUX_SOCKET_FOLDER}/${1}/socket" attach -t "${2}"
 }

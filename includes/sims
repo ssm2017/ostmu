@@ -48,6 +48,20 @@ simulator_console_is_answering() {
   return $?;
 }
 
+# Check if the simulator is answering
+# $1 Url of the simulator (http://localhost)
+# $2 Port of the simulator
+simulator_simstatus() {
+  URI="$1:$2/simstatus/"
+
+  # check if answer was OK
+  response=$(curl --silent --output /dev/null ${URI})
+  if [ ! $response = "OK" ]; then
+	  return 1;
+  fi
+  return 0;
+}
+
 # Check if the region stats are answering
 # $1 Url of the simulator (http://localhost)
 # $2 Port of the simulator

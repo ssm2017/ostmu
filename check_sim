@@ -40,7 +40,7 @@ sim_name=$2
 success=0
 
 # ======================
-#         checks
+#         user
 # ======================
 
 # check if the user exists
@@ -50,6 +50,10 @@ else
   echo -e ${SymbolNotOk} $"The user ${user_name} does not exist."
   exit 1;
 fi
+
+# ======================
+#        folder
+# ======================
 
 # check if the simulator folder exists
 if simulator_folder_exists ${user_name} ${sim_name} > /dev/null;then
@@ -67,6 +71,10 @@ if [ ! -f ${config_file} ]; then
 fi
 source ${config_file}
 
+# ======================
+#         pid
+# ======================
+
 # check the simulator pid
 PID=$(get_sim_pid ${user_name} ${sim_name})
 if [ $? = 0 ]; then
@@ -75,19 +83,23 @@ if [ $? = 0 ]; then
     echo -e ${SymbolOk} $"PID is running."
   else
     echo -e ${SymbolNotOk} $"PID is not running."
-    exit 1;
+    exit 2;
   fi
 else
   echo -e ${SymbolNotOk} $"The file PID does not exist."
-  exit 1;
+  exit 2;
 fi
+
+# ======================
+#         tmux
+# ======================
 
 # check if the tmux session is running
 if tmux_session_exists "${user_name}" "${sim_name}"; then
   echo -e ${SymbolOk} $"The tmux session is running."
 else
   echo -e ${SymbolNotOk} $"The tmux session is not running."
-  exit 1;
+  exit 3;
 fi
 
 # check if the tmux window is running
@@ -95,7 +107,7 @@ if tmux_window_exists "${user_name}" "${sim_name}"; then
   echo -e ${SymbolOk} $"The tmux window is running."
 else
   echo -e ${SymbolNotOk} $"The tmux window is not running."
-  exit 1;
+  exit 3;
 fi
 
 # check if the console is answering
@@ -106,6 +118,20 @@ fi
 #  exit 1;
 #fi
 
+# ======================
+#       simulator
+# ======================
+if simulator_simstatus "http://${EXTERNAL_HOST_NAME}" ${SIM_PORT}; then
+  echo -e ${SymbolOk} $"The simulator is answering to simstatus."
+else
+  echo -e ${SymbolNotOk} $"The simulator is not answering to simstatus."
+  exit 4;
+fi
+
+# ======================
+#        region
+# ======================
+
 # get the user db password
 # @todo : see sqlite
 db_pass_file="/home/${1}/.opensimulator/db_pass"
@@ -113,7 +139,7 @@ if [ -f ${db_pass_file} ]; then
   db_password=`cat ${db_pass_file}`
 else
   echo -e ${SymbolNotOk} $"The file ${db_pass_file} does not exist."
-  exit 1;
+  exit 5;
 fi
 
 # check if the regions are responding
@@ -124,7 +150,7 @@ for region in $regions; do
     echo -e ${SymbolOk} $"The region ${region} is answering."
   else
     echo -e ${SymbolNotOk} $"The region ${region} is not answering."
-    exit 1;
+    exit 5;
   fi
 done
 
